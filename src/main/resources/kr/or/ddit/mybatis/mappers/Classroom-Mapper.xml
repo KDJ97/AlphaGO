@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="Classroom-Mapper">
+  <sql id="search">
+		<if test="searchType == 'n'.toString()">
+			and room_no like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'p'.toString()">
+			and use_purpose like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and capacity like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'npc'.toString()">
+			and (
+			room_no like '%'||#{keyword}||'%'
+			or
+			use_purpose like '%'||#{keyword}||'%'						
+			or
+			capacity like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</sql>
+
+  <sql id="searchClass">
+		<if test="searchType == 'n'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'cn'.toString()">
+			and class_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'sn'.toString()">
+			and subject_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'sdn'.toString()">
+			and subdetail_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'all'.toString()">
+			and (
+			name like '%'||#{keyword}||'%'
+			or
+			class_name like '%'||#{keyword}||'%'						
+			or
+			subject_name like '%'||#{keyword}||'%'						
+			or
+			subdetail_name like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</sql>
+  
+  
+	  <select id="getAllClassroom" resultType="room">
+	    	select * 
+			from classroom
+			where room_code is not null
+			<include refid="search" />	
+			order by room_no			
+	  </select>
+	  
+	  <select id="getNoSearchClassroom" resultType="room">
+	  	select * from classroom
+	  	order by room_no
+	  </select>
+	  
+	  <select id="selectClassroomListCount" resultType="int">
+		select
+		count(*)
+		from
+		classroom
+		where room_code is not null  			  	
+		<include refid="search" />
+	</select>
+	  
+	  <select id="getClassroom" resultType="room">
+		select
+		    room_code
+		   ,room_no
+		   ,room_floor
+		   ,capacity
+		   ,use_purpose
+		from
+		    classroom  
+		order by room_no
+	  </select>
+
+	  <select id="getOneClassroom" resultType="room">
+		select
+		    room_code
+		   ,room_no
+		   ,room_floor
+		   ,capacity
+		   ,use_purpose
+		   ,picture
+		from
+		    classroom  
+		where
+			room_code = #{roomCode}
+	  </select>
+	  
+	  <select id="selectRoomByRno" resultType="room">
+		select
+			room_code
+			,room_no
+			,room_floor
+			,capacity
+			,use_purpose
+		from
+			classroom
+		where room_no = #{roomNo}
+	  </select>
+	  
+	  <select id="getClassroomSeq" resultType="int">
+	  	select room_no_seq.nextval from dual
+	  </select>
+	  
+	  <select id="getUseFixtSeq" resultType="int">
+	  	select usefixture_seq.nextval from dual
+	  </select>
+	  
+	  <select id="getAllFixture" resultType="fixture">
+	  	select fxtcode, fxtname, fxticon from fixture
+	  </select>
+	  
+	  <update id="insertClassroom">
+			insert into classroom (
+			room_code
+			,room_no
+			,room_floor
+			,capacity
+			,use_purpose
+			,picture
+			)
+			values (
+			#{roomCode}
+			,#{roomNo}
+			,#{roomFloor}
+			,#{capacity}
+			,#{usePurpose}
+			,#{picture}
+			)
+	  </update>
+
+	<update id="removeClassroom">
+		DELETE FROM classroom
+		WHERE
+		room_code = #{roomCode}
+	</update>
+
+	<update id="removeUseFixt">
+		delete from usefixt
+		where room_code = #{roomCode}
+	</update>
+	
+	<update id="insertUseFixt">
+		insert into usefixt (
+		fixuseno
+		,room_code
+		,fxtcode
+		) values (
+		#{fixuseno}
+		,#{roomCode}
+		,#{fxtcode}
+		)
+	</update>
+	
+	<select id="getUseFixture" resultType="useFixt">
+		select a.fixuseno, a.room_code, a.fxtcode, b.fxticon
+		from usefixt a, fixture b
+		where a.fxtcode = b.fxtcode
+	</select>
+	
+	<select id="getUsedFixtByRoomCode" resultType="useFixt">
+		select a.fixuseno, a.room_code, a.fxtcode, b.fxticon
+		from usefixt a, fixture b
+		where a.fxtcode = b.fxtcode
+          and a.room_code=#{roomCode}
+	</select>
+	
+	<select id="getAllUseRoom" resultType="room">
+		select
+			a.room_code
+			,a.room_no
+			,b.time_code
+			, b.classday
+			, b.ctperiod
+			, c.class_code
+			, c.start_date
+			, c.end_date
+			, b.start_time
+			, b.end_time
+		 from classroom a, time_detail b, class c
+		where a.room_code = b.room_code
+		  and b.class_code = c.class_code
+		  and c.cpcheck='3'
+		order by a.room_no
+	</select>
+	
+	<select id="getUsedRoom" resultType="room">
+		select
+			a.room_code
+			,a.room_no
+			,b.time_code
+			, b.classday
+			, b.ctperiod
+			, c.class_code
+			, c.start_date
+			, c.end_date
+			, b.start_time
+			, b.end_time
+		 from classroom a, time_detail b, class c
+		where a.room_code = b.room_code
+		  and b.class_code = c.class_code
+		  and c.cpcheck='3'
+		  and b.room_code=#{roomCode}
+		  and b.classday=#{classday}
+		order by a.room_no
+	</select>
+	
+	<select id="selectClassByRCode">
+		select
+			 distinct c.class_code
+		 from classroom a, time_detail b, class c
+		where a.room_code = b.room_code
+		  and b.class_code = c.class_code
+		  <![CDATA[
+          and c.start_date <= to_date(sysdate)
+          and c.end_date >= to_date(sysdate)
+          and a.room_code=#{roomCode}]]>
+	</select>
+	
+	<select id="selectClassListByRoomCode" resultType="class">
+		select b.class_code
+                   ,b.class_rank
+                   ,b.class_name
+                   ,b.id
+                   ,b.subdetail_code
+                   ,b.cpno
+                   ,b.start_date
+                   ,b.end_date
+                   ,b.class_price
+                   ,b.total_time
+                   ,b.class_grade
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,b.subject_name
+                   ,b.name
+                   ,b.stu_cnt
+                   ,min(b.start_time) as mintime
+          from  (select
+                    a.class_code
+                   ,a.class_rank
+                   ,a.class_name
+                   ,a.id
+                   ,a.subdetail_code
+                   ,a.cpno
+                   ,a.start_date
+                   ,a.end_date
+                   ,a.class_price
+                   ,a.total_time
+                   ,a.class_grade
+                   ,a.stu_cnt
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,c.subject_name
+                   ,d.name
+                   ,e.start_time
+                from
+                    class a, subdetail b, subject c, member d, time_detail e, classroom f
+                where a.subdetail_code = b.subdetail_code
+                  and b.subject_code=c.subject_code	
+                  and a.id = d.id
+                  and e.class_code = a.class_code
+                  and e.room_code = f.room_code
+                  and a.cpcheck='3'
+                  and f.room_code = #{roomCode}
+                  <![CDATA[
+                  and a.start_date <= to_date(sysdate)
+                  and a.end_date>= to_date(sysdate)]]>
+                  ) b
+            where class_code is not null
+            <include refid="searchClass"/>
+            group by b.class_code
+                   ,b.class_rank
+                   ,b.class_name
+                   ,b.id
+                   ,b.subdetail_code
+                   ,b.cpno
+                   ,b.start_date
+                   ,b.end_date
+                   ,b.class_price
+                   ,b.total_time
+                   ,b.class_grade
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,b.subject_name
+                   ,b.name
+                   ,b.stu_cnt
+	</select>
+	
+	<select id="selectClassListByRoomCodeCount" resultType="int">
+	select count(*)
+        from   ( select b.class_code
+                   ,b.class_rank
+                   ,b.class_name
+                   ,b.id
+                   ,b.subdetail_code
+                   ,b.cpno
+                   ,b.start_date
+                   ,b.end_date
+                   ,b.class_price
+                   ,b.total_time
+                   ,b.class_grade
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,b.subject_name
+                   ,b.name
+                   ,min(b.start_time) as mintime
+          from  (select
+                    a.class_code
+                   ,a.class_rank
+                   ,a.class_name
+                   ,a.id
+                   ,a.subdetail_code
+                   ,a.cpno
+                   ,a.start_date
+                   ,a.end_date
+                   ,a.class_price
+                   ,a.total_time
+                   ,a.class_grade
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,c.subject_name
+                   ,d.name
+                   ,e.start_time
+                from
+                    class a, subdetail b, subject c, member d, time_detail e, classroom f
+                where a.subdetail_code = b.subdetail_code
+                  and b.subject_code=c.subject_code	
+                  and a.id = d.id
+                  and e.class_code = a.class_code
+                  and e.room_code = f.room_code
+                  and a.cpcheck='3'
+                  and f.room_code = #{roomCode}
+                  <![CDATA[
+                  and a.start_date <= to_date(sysdate)
+                  and a.end_date>= to_date(sysdate)]]>
+                  ) b
+            where class_code is not null
+                  <include refid="searchClass"/>
+            group by b.class_code
+                   ,b.class_rank
+                   ,b.class_name
+                   ,b.id
+                   ,b.subdetail_code
+                   ,b.cpno
+                   ,b.start_date
+                   ,b.end_date
+                   ,b.class_price
+                   ,b.total_time
+                   ,b.class_grade
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,b.subject_name
+                   ,b.name)
+	</select>
+	
+	<select id="selectClassListByRoomCodeClassDay" resultType="class">
+		select b.class_code
+                   ,b.class_rank
+                   ,b.class_name
+                   ,b.id
+                   ,b.subdetail_code
+                   ,b.cpno
+                   ,b.start_date
+                   ,b.end_date
+                   ,b.class_price
+                   ,b.total_time
+                   ,b.class_grade
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,b.subject_name
+                   ,b.name
+                   ,b.stu_cnt
+                   ,min(b.start_time) as mintime
+          from  (select
+                    a.class_code
+                   ,a.class_rank
+                   ,a.class_name
+                   ,a.id
+                   ,a.subdetail_code
+                   ,a.cpno
+                   ,a.start_date
+                   ,a.end_date
+                   ,a.class_price
+                   ,a.total_time
+                   ,a.class_grade
+                   ,a.stu_cnt
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,c.subject_name
+                   ,d.name
+                   ,e.start_time
+                from
+                    class a, subdetail b, subject c, member d, time_detail e, classroom f
+                where a.subdetail_code = b.subdetail_code
+                  and b.subject_code=c.subject_code	
+                  and a.id = d.id
+                  and e.class_code = a.class_code
+                  and e.room_code = f.room_code
+                  and a.cpcheck='3'
+                  and f.room_code = #{roomCode}
+                  and e.classday=#{classday}
+                  <![CDATA[
+                  and a.start_date <= to_date(sysdate)
+                  and a.end_date>= to_date(sysdate)]]>
+                  ) b
+            where class_code is not null
+            group by b.class_code
+                   ,b.class_rank
+                   ,b.class_name
+                   ,b.id
+                   ,b.subdetail_code
+                   ,b.cpno
+                   ,b.start_date
+                   ,b.end_date
+                   ,b.class_price
+                   ,b.total_time
+                   ,b.class_grade
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,b.subject_name
+                   ,b.name
+                   ,b.stu_cnt
+	</select>
+	
+	<select id="selectClassTimeByRoom" resultType="room">
+		select
+		    a.class_code
+		   ,a.start_date
+		   ,a.end_date
+		   ,a.total_time
+		   ,b.time_code
+		   ,b.room_code
+		   ,b.start_time
+		   ,b.end_time
+		   ,b.classday
+		   ,b.ctperiod
+		from
+		    class a, time_detail b
+		where a.class_code = b.class_code
+          <![CDATA[
+          and to_date(start_date)<=to_date(sysdate)
+          and to_date(end_date)>=to_date(sysdate)
+          ]]>
+          and a.cpcheck='3'
+		  and b.room_code = #{roomCode}
+          and a.class_code = #{classCode}
+          and b.classday=#{classday}
+	</select>
+	
+	<update id="updateClassroom">
+		update classroom
+		set
+			capacity=#{capacity}
+			,room_no=#{roomNo}
+			,room_floor=#{roomFloor}
+			,picture=#{picture}
+			,use_purpose=#{usePurpose}
+		where
+			room_code = #{roomCode}
+	</update>
+	
+	<select id="selectUseFixtCountByRoomCode" resultType="int">
+	select count(*)
+	from(
+		select
+			fixuseno
+			,room_code
+			,fxtcode
+		from
+			usefixt
+		where room_code = #{roomCode}
+		  and fxtcode = #{fxtcode}) a
+	</select>
+	
+	<select id="getUseRoomTimeByCpcheck" resultType="useroom">
+			select
+		    a.class_code
+		   ,a.id
+		   ,a.start_date
+		   ,a.end_date
+		   ,a.total_time
+		   ,b.time_code
+		   ,b.room_code
+		   ,b.start_time
+		   ,b.end_time
+		   ,b.classday
+		   ,b.ctperiod
+		from
+		    class a, time_detail b
+		where a.class_code = b.class_code
+		 <![CDATA[
+		  and to_date(start_date)<=to_date(sysdate)
+          and to_date(end_date)>=to_date(sysdate)
+          ]]>
+          and a.cpcheck='3'
+		  and room_code = #{roomCode}
+	</select>
+	
+  </mapper>
+  
+  
+  

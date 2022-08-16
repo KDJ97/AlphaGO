@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Tclass-Mapper">
+	
+	<sql id="cpcheck">
+		<if test="cpcheck=='전체'.toString()">
+		</if>
+		<if test="cpcheck=='' or cpcheck==null">
+		</if>
+		<if test="cpcheck!='전체'.toString() and cpcheck!=null and cpcheck!=''">
+			and a.cpcheck = #{cpcheck}
+		</if>
+		
+		
+	</sql>
+	
+	<sql id="search">
+		<if test="keyword != null or keyword !=''">
+			and a.class_name like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+	
+	<select id="selectSearchClassList" resultType="class">
+		select distinct
+			a.class_code
+		   ,a.cpno	
+		   ,a.id	
+		   ,b.subject_name	
+		   ,a.class_rank
+		   ,a.class_name
+		   ,a.start_date
+		   ,a.end_date
+		   ,a.cpcheck
+		from
+			class a, subject b, subdetail c
+		where a.cpcheck = '3'   
+		<![CDATA[
+		and a.end_date>=sysdate
+		]]>
+		and a.subdetail_code=c.subdetail_code 
+		and c.subject_code=b.subject_code	
+		<include refid="search" />
+	</select>
+	
+	<select id="selectSearchUnregisteredClassList" resultType="class">
+		select  
+			a.class_code
+		   ,a.id	
+		   ,b.subject_name	
+		   ,a.class_rank
+		   ,a.class_name		  
+		   ,a.start_date
+		   ,a.end_date
+		   ,a.cpcheck
+		from
+			class a, subject b, subdetail c
+		where a.cpcheck != '3'
+		<![CDATA[
+		and a.end_date>=sysdate
+		]]>
+		and a.id=#{id}  
+		and a.subdetail_code=c.subdetail_code 
+		and c.subject_code=b.subject_code		   
+		<include refid="search" />
+		<include refid="cpcheck" />
+		order by a.start_date
+	</select>
+	
+	<select id="selectClassForModal" resultType="class">
+		select distinct
+			a.class_code
+           ,f.name
+           ,a.total_time
+		   ,d.subject_name	
+		   ,a.class_rank
+		   ,a.class_name
+		   ,a.start_date
+		   ,a.end_date
+		   ,a.cpcheck
+		   ,a.id
+		from
+			class a, time_detail b, classroom c, subject d, subdetail e, member f
+		where
+			a.class_code=b.class_code
+		and b.room_code=c.room_code	
+        and a.id=f.id
+		and a.subdetail_code=e.subdetail_code
+		and e.subject_code=d.subject_code
+				   
+		and a.class_code=#{class_code}
+	</select>
+	
+	<select id="selectCPNOandTextbook" resultType="classPlan">
+		select a.cphead,a.textbook,a.cpno
+		  from class_plan a, class b
+	  	 where a.cpno=b.cpno
+		   and b.class_code=#{class_code}
+	</select>
+	
+	<select id="selectClassTime" resultType="classTime" >
+		select 
+			a.class_code
+		   ,a.start_time
+		   ,a.end_time
+		   ,a.classday
+		   ,b.room_no
+		from
+		    time_detail a, classroom b
+		where class_code=#{class_code}
+		  and a.room_code=b.room_code
+		order by a.classday   
+	</select>
+	
+	<select id="selectWeekPlan" resultType="weekPlan" >
+		select c.wpno, c.week, c.content, c.cpno
+		  from class_plan a, class b, weekplan c
+		 where a.cpno=b.cpno
+		   and b.cpno=c.cpno
+		   and b.class_code=#{class_code}
+		 order by c.week  
+	</select>
+	
+	<select id="selectHomeworkPlan" resultType="homeworkPlan">
+		select c.homeworkplan, c.no, c.content, c.cpno
+		  from class_plan a, class b, homeworkplan c
+		 where a.cpno=b.cpno
+		   and b.cpno=c.cpno
+		   and b.class_code=#{class_code}
+		 order by c.no  
+	</select>
+	
+	<select id="selectClassPlanSeqNextValue" resultType="int">
+		select classplan_seq.nextval
+		from dual		
+	</select>
+	
+	<update id="insertClassPlan" parameterType="classPlan" >
+		insert into class_plan (cpno, subject_code, cphead, textbook)
+		values (#{cpno},#{subject_code},#{cphead},#{textbook})
+	</update>
+	
+	<select id="selectWeekPlanSeqNextValue" resultType="int">
+		select classplan_seq.nextval
+		from dual		
+	</select>
+	
+	<update id="insertWeekPlan" parameterType="weekPlan">
+		insert into weekplan (wpno, cpno, week, content)
+		values (#{wpno},#{cpno},#{week},#{content})
+	</update>
+	
+	<select id="selectHomeworkPlanSeqNextValue" resultType="int">
+		select classplan_seq.nextval
+		from dual		
+	</select>
+	
+	<update id="insertHomeworkPlan" parameterType="homeworkPlan">
+		insert into homeworkplan (homeworkplan, cpno, content, no)
+		values (#{homeworkplan},#{cpno},#{content},#{no})
+	</update>
+	
+	<update id="updateClassToRegisterClassPlan" parameterType="class">
+		update class
+		set cpno=#{cpno},cpcheck=#{cpcheck}
+		where class_code=#{classCode}
+	</update>
+	
+	
+	<update id="deleteClassPlan">
+		delete
+		  from weekplan
+		 where wpno=#{wpno} 
+	</update>
+	<update id="deleteHomeworkPlan">
+		delete
+		  from homeworkplan
+		 where homeworkplan=#{homeworkplan} 
+	</update>
+	
+	
+	<update id="updateWeekPlan" >
+		update weekplan
+		set 
+			week=#{week},
+			content=#{content}
+		where wpno=#{wpno}	
+	</update>
+	<update id="updateHomeworkPlan" >
+		update homeworkplan
+		set 
+			no=#{no},
+			content=#{content}
+		where homeworkplan=#{homeworkplan}	
+	</update>
+	<update id="updateClassPlan">
+		update class_plan
+		set
+			cphead=#{cphead},
+			textbook=#{textbook}
+		where cpno=#{cpno}	
+	</update>
+	
+	
+	<select id="selectClassesForHome" resultType="class">
+		 select class_code,cpno,class_name,start_date, end_date
+     	   from class
+    	  where id=#{id}
+            and cpcheck='3'
+            <![CDATA[
+            and end_date>=sysdate
+            ]]>
+	</select>
+	<select id="selectProgressForHome" resultType="weekPlan">
+		select a.class_name,c.week,c.content,a.start_date,a.end_date,d.subject_name
+   		  from class a, class_plan b, weekplan c, subject d, subdetail e
+   		 where a.cpno=b.cpno
+ 		   and b.cpno=c.cpno
+ 		   and e.subject_code=d.subject_code
+  		   and a.subdetail_code=e.subdetail_code
+   		   and c.cpno=#{cpno}
+      order by c.week asc
+	</select>
+	<select id="weekPlanCount" resultType="int">
+		select count(*) 
+     	  from weekplan
+     	 where cpno=#{cpno}
+	</select>
+	
+	<select id="selectClassForReview" resultType="class">
+		select class_code,class_name, end_date
+    	  from class
+  	     where id=#{id}
+      order by end_date desc	
+	</select>
+	<select id="selectReview" resultType="classreview">
+		select review_code,star_score,title, content
+          from class_review
+         where class_code=#{classCode}
+    </select>
+	<select id="selectReviewDetail" resultType="classreview">
+		select *
+		  from class_review
+		 where review_code=#{reviewCode} 
+	</select>
+	
+	<select id="selectAllReview" resultType="classreview">
+		select a.review_code,b.class_name,a.star_score,a.title, a.content
+          from class_review a, class b
+         where a.class_code=b.class_code
+           and b.id=#{id}
+	</select>
+	
+	<select id="selectTodayConsult" resultType="tecounselt">
+		select a.coun_code, a.con_start, a.con_end, a.title, b.name
+ 		  from counselt a, member b
+		 where counselor=#{counselor}
+		   and a.client=b.id
+ 		   and to_char(meetdate,'YYYYMMDD') = TO_CHAR(sysdate,'YYYYMMDD')
+	</select>
+	<select id="selectTodayHomework" resultType="assign">
+		select a.title, a.end_date, b.class_name
+	  	  from assign a, class b
+		 where b.id=#{id}
+		   and a.class_code=b.class_code
+		   and to_char(a.end_date,'YYYYMMDD') = TO_CHAR(sysdate,'YYYYMMDD')
+	</select>
+	<select id="selectTodayTest" resultType="exam">
+		select a.exam_name, a.start_date, a.end_date
+		  from exam a, class b
+		 where a.class_code = b.class_code
+		   and to_char(a.start_date,'yyyymmdd') = to_char(sysdate,'yyyymmdd')
+		   and b.id=#{id}
+	</select>	
+	
+</mapper>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Dm-Mapper">
+	<select id="selectSendList" parameterType="str" resultType="dm">
+		select
+		    dm_code
+		   ,dm_div
+		   ,dm_title
+		   ,dm_content
+		   ,dm_date
+		   ,dm_sender
+		   ,dm_receiver
+		   ,dm_status
+		from
+		    dm
+		where dm_sender = #{id}
+		  and dm_div = 'S'
+		order by dm_date desc
+	</select>
+	<select id="selectReciveList" parameterType="str" resultType="dm">
+		select
+		    dm_code
+		   ,dm_div
+		   ,dm_title
+		   ,dm_content
+		   ,dm_date
+		   ,dm_sender
+		   ,dm_receiver
+		   ,dm_status
+		from
+		    dm
+		where dm_receiver = #{id}
+		  and dm_div = 'R'
+		order by dm_date desc
+	</select>
+
+	<select id="selectDm" parameterType="map" resultType="dm">
+		select
+		    dm_code
+		   ,dm_div
+		   ,dm_title
+		   ,dm_content
+		   ,dm_date
+		   ,dm_sender
+		   ,dm_receiver
+		   ,dm_status
+		from
+		    dm
+		where dm_code = #{code}
+		  and dm_div = #{div}
+	</select>
+	<update id="updateDmByRead" parameterType="str">
+		update dm
+		    set
+		        dm_status = 1
+		where
+		    dm_code = #{code}
+	</update>
+
+	<update id="deleteDm" parameterType="map">
+		 delete
+		   from
+		   		  dm
+		  where
+		          dm_code =#{code}
+		    and   dm_div =#{div}
+	</update>
+
+	<select id="selectNewDm" parameterType="str" resultType="int">
+		select
+         count(*)
+		from
+		    dm
+	    where dm_receiver = #{id}
+		  and dm_div = 'R'
+	      and dm_status = 0
+	</select>
+
+	<select id="selectMaxDm" resultType="int">
+		select dm_seq.nextval from dual
+	</select>
+
+	<update id="insertDm" parameterType="dm">
+	INSERT INTO dm (
+	    dm_code
+	   ,dm_div
+	   ,dm_title
+	   ,dm_content
+	   ,dm_date
+	   ,dm_sender
+	   ,dm_receiver
+	   ,dm_status
+	) VALUES (
+	    #{dmCode}
+	   ,#{dmDiv}
+	   ,#{dmTitle}
+	   ,#{dmContent}
+	   ,sysdate
+	   ,#{dmSender}
+	   ,#{dmReceiver}
+	   ,0
+	)
+	</update>
+
+	<select id="selectNotReadDmById" resultType="dm" parameterType="str">
+		select
+		    dm_code
+		   ,dm_div
+		   ,dm_title
+		   ,dm_content
+		   ,dm_date
+		   ,dm_sender
+		   ,dm_receiver
+		   ,dm_status
+		from
+		    dm
+		where dm_div = 'R'
+		and dm_receiver = #{id}
+		and dm_status = 0
+		order by dm_date desc
+	</select>
+</mapper>

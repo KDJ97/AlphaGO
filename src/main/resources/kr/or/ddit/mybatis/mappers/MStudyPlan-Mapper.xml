@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MStudyPlan-Mapper">
+
+<select id="selectClassListByCpcheck" resultType="class">
+	select
+		a.class_code
+		,a.class_rank
+		,a.class_name
+		,a.id
+		,a.subdetail_code
+		,a.cpno
+		,a.start_date
+		,a.end_date
+		,a.class_price
+		,a.total_time
+		,a.class_grade
+		,b.subdetail_name
+		,b.subject_code
+		,c.subject_name
+		,d.name
+		,a.cpcheck
+	from
+		class a, subdetail b, subject c, member d
+	where a.subdetail_code = b.subdetail_code
+		and b.subject_code=c.subject_code
+		and a.id = d.id
+		and a.cpcheck=#{cpcheck}
+	order by b.subdetail_name
+</select>
+
+<update id="updateCpcheck">
+update class
+    set
+        cpcheck = #{cpcheck}
+where
+    class_code = #{classCode}
+</update>
+
+<select id="selectClassList" resultType="class">
+	select
+		a.class_code
+		,a.class_rank
+		,a.class_name
+		,a.id
+		,a.subdetail_code
+		,a.cpno
+		,a.start_date
+		,a.end_date
+		,a.class_price
+		,a.total_time
+		,a.class_grade
+		,b.subdetail_name
+		,b.subject_code
+		,c.subject_name
+		,d.name
+		,a.cpcheck
+	from
+		class a, subdetail b, subject c, member d
+	where a.subdetail_code = b.subdetail_code
+		and b.subject_code=c.subject_code
+		and a.id = d.id
+		and a.cpcheck='3'
+	order by b.subdetail_name
+</select>
+
+<select id="selectClassReviewCount" resultType="int">
+	select count(*) 
+	  from class a, class_review b
+	 where a.class_code = b.class_code
+	   and a.class_code=#{classCode}
+</select>
+
+<update id="deleteTimeDetailByClassCode">
+	delete from time_detail
+	where class_code =#{classCode}
+</update>
+
+<update id="deleteClassByClassCode">
+	delete from class
+	where class_code =#{classCode}
+</update>
+
+</mapper>

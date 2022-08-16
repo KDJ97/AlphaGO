@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Popup-Mapper">
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and content like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			and (
+			title like '%'||#{keyword}||'%'
+			or
+			content like '%'||#{keyword}||'%'
+			)
+		</if>
+	</sql>
+
+	<select id="selectPopupList" resultType="popup">
+		select
+			popcode
+			,title
+			,content
+			,inuse
+			,regdate
+			,start_date
+			,end_date
+		from
+			popup
+		where
+			popcode is not null
+		<include refid="search" />
+		order by regdate
+	</select>
+
+	<select id="selectPopupCount" resultType="int">
+		select count(*) from popup
+	</select>
+	
+	<select id="selectPopAttachCount" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			popattach
+		where popcode=#{popcode}
+	</select>
+
+	<select id="selectPopupSeq" resultType="int">
+		select popup_seq.nextval from dual
+	</select>
+
+	<select id="selectPopAttachSeq" resultType="int">
+		select popattach_seq.nextval from dual
+	</select>
+	
+	<update id="insertPopup">
+		insert into popup (
+			popcode
+			,title
+			,content
+			,inuse
+			,regdate
+			,start_date
+			,end_date
+		) values (
+			#{popcode}
+			,#{title}
+			,#{content}
+			,#{inuse}
+			,to_date(sysdate)
+			,#{startDate}
+			,#{endDate}
+		)
+	</update>
+	
+	<update id="insertPopAttach">
+		insert into popattach (
+			attachno
+			,popcode
+			,uploadpath
+			,filename
+			,filetype
+			,regdate
+		) values (
+			#{attachno}
+			,#{popcode}
+			,#{uploadpath}
+			,#{filename}
+			,#{filetype}
+			,to_date(sysdate)
+		)
+	</update>
+	
+	<select id="selectPopupDetail" resultType="popup">
+		select
+			popcode
+			,title
+			,content
+			,inuse
+			,regdate
+			,start_date
+			,end_date
+		from
+			popup
+		where popcode=#{popcode}
+	</select>
+	
+	<select id="selectPopAttaches" resultType="popAttach">
+		select
+			attachno
+			,popcode
+			,uploadpath
+			,filename
+			,filetype
+			,regdate
+		from
+			popattach
+		where popcode=#{popcode}	
+	</select>
+	
+	<select id="selectAttachByAno" resultType="popAttach">
+		select
+			attachno
+			,popcode
+			,uploadpath
+			,filename
+			,filetype
+			,regdate
+		from
+			popattach
+		where attachno=#{attachno}
+	</select>
+	
+	<update id="removePopAttach">
+		delete from popattach
+		where
+		attachno = #{attachno}
+	</update>
+	
+	<update id="modifyPopup">
+		update popup
+		set
+			title=#{title}
+			,content =#{content}
+			,inuse =#{inuse}
+			,start_date =#{startDate}
+			,end_date =#{endDate}
+			,regdate=to_date(sysdate)
+		where
+			popcode = #{popcode}
+	</update>
+	
+	<update id="deletePopup">
+		delete from popup
+		where
+			popcode = #{popcode}
+	</update>
+	
+	<update id="deletePopAttachByPopcode">
+		delete from popattach
+		where
+			popcode = #{popcode}
+	</update>
+	
+	<select id="selectAttachByPopcode" resultType="popAttach">
+		select
+			attachno
+			,popcode
+			,uploadpath
+			,filename
+			,filetype
+			,regdate
+		from
+			popattach
+		where popcode = #{popcode}
+	</select>
+	
+	<select id="selectUsePopup" resultType="popup">
+		select
+			popcode
+			,title
+			,content
+			,inuse
+			,regdate
+			,start_date
+			,end_date
+		from
+			popup
+		where inuse = 'Y'
+		<![CDATA[
+		      and to_date(sysdate) >= start_date
+			  and to_date(sysdate) <= end_date
+			  ]]>
+	</select>
+	
+	<select id="selectUsePopupCount" resultType="int">
+		select
+			count(*)
+		from
+			popup
+		where inuse = 'Y'
+		<![CDATA[
+		      and to_date(sysdate) >= start_date
+			  and to_date(sysdate) <= end_date
+			  ]]>
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

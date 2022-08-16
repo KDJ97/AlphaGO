@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="University-Mapper">
+	<sql id="prediction">
+		<if test="standard == 'top'.toString()">
+			and university_kor_score
+		        + university_eng_score
+		        + university_math_score
+		        + university_social_score
+		        + university_science_score <![CDATA[ > ]]> #{sum}
+		    and university_kor_score
+		        + university_eng_score
+		        + university_math_score
+		        + university_social_score
+		        + university_science_score <![CDATA[ <= ]]> #{sum} + 10
+
+		</if>
+		<if test="standard == 'mid'.toString()">
+			and university_kor_score
+		        + university_eng_score
+		        + university_math_score
+		        + university_social_score
+		        + university_science_score <![CDATA[ > ]]>  #{sum} - 10
+		    and university_kor_score
+		        + university_eng_score
+		        + university_math_score
+		        + university_social_score
+		        + university_science_score <![CDATA[ <= ]]>  #{sum}
+		</if>
+		<if test="standard == 'bot'.toString()">
+			and university_kor_score
+		        + university_eng_score
+		        + university_math_score
+		        + university_social_score
+		        + university_science_score <![CDATA[ < ]]> #{sum} -20
+		    and university_kor_score
+		        + university_eng_score
+		        + university_math_score
+		        + university_social_score
+		        + university_science_score <![CDATA[ > ]]> #{sum} -25
+		</if>
+	</sql>
+
+	<select id="selectAllUniList" resultType="kr.or.ddit.dto.UniversityVO">
+		select
+		    univ_code
+		   ,university_name
+		   ,university_kor
+		   ,university_eng
+		   ,university_math
+		   ,university_social
+		   ,university_science
+		   ,university_kor_score
+		   ,university_eng_score
+		   ,university_math_score
+		   ,university_social_score
+		   ,university_science_score
+		from
+		    university
+	</select>
+
+	<select id="selectUniListByStandard" parameterType="map" resultType="kr.or.ddit.dto.UniversityVO">
+		select
+		    univ_code
+		   ,university_name
+		   ,university_kor
+		   ,university_eng
+		   ,university_math
+		   ,university_social
+		   ,university_science
+		   ,university_kor_score
+		   ,university_eng_score
+		   ,university_math_score
+		   ,university_social_score
+		   ,university_science_score
+		from
+		    university
+		where univ_code is not null
+		<include refid="prediction"></include>
+	</select>
+
+	<select id="selectUniByCode" parameterType="str" resultType="kr.or.ddit.dto.UniversityVO">
+		select
+		    univ_code
+		   ,university_name
+		   ,university_kor
+		   ,university_eng
+		   ,university_math
+		   ,university_social
+		   ,university_science
+		   ,university_kor_score
+		   ,university_eng_score
+		   ,university_math_score
+		   ,university_social_score
+		   ,university_science_score
+		from
+		    university
+		where
+			univ_code = #{code}
+	</select>
+</mapper>

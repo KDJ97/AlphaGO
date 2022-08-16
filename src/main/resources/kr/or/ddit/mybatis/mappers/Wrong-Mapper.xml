@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Wrong-Mapper">
+	<sql id="cateType">
+		<if test="cateType != null and cateType != ''">
+			and d.class_name like '%'||#{cateType}||'%'
+		</if>
+	</sql>
+	<sql id="searchType">
+		<if test="searchType != null and searchType != ''">
+			and b.exam_name like '%'||#{searchType}||'%'
+		</if>
+	</sql>
+
+	<select id="selectExam" resultType="Exam" parameterType="map">
+		select a.exam_name
+		from exam a, class b, academy_score c
+		where a.class_code = b.class_code
+		and c.id = #{id}
+		and a.exam_code = c.exam_code
+		and b.class_name = #{className}
+	</select>	
+	
+	<select id="selectWrong" resultType="Wrong" parameterType="str">
+		select a.wno, a.content, b.exam_name, c.pronum, d.class_name, e.subdetail_name, c.problem_code
+		from wrong a, exam b, col_exam c, class d, subdetail e
+		where a.exam_code = b.exam_code 
+		and b.exam_code = c.exam_code
+		and b.class_code = d.class_code
+		and a.problem_code = c.problem_code
+		and e.subdetail_code = d.subdetail_code
+		and a.id = #{id}
+		<include refid="cateType" />
+		<include refid="searchType" />
+		order by a.updatedate desc, d.class_name, b.exam_name, c.pronum
+			
+	</select>
+	
+	<select id="selectWrongCount" resultType="int" parameterType="str">
+		select count(a.wno)
+		from wrong a, exam b, col_exam c, class d, subdetail e
+		where a.exam_code = b.exam_code 
+		and b.exam_code = c.exam_code
+		and b.class_code = d.class_code
+		and a.problem_code = c.problem_code
+		and e.subdetail_code = d.subdetail_code
+		and a.id = #{id}
+		<include refid="cateType" />
+		<include refid="searchType" />
+		order by c.pronum
+	</select>
+	
+	<select id="selectDetailWrong" resultType="Wrong" parameterType="map">
+		select a.*, b.exam_name, c.pronum, d.class_name, e.subdetail_name, c.problem_code, f.*, g.*
+		from wrong a, exam b, col_exam c, class d, subdetail e, problem f, prob_content g
+		where a.exam_code = b.exam_code 
+		and b.exam_code = c.exam_code
+		and b.class_code = d.class_code
+		and a.problem_code = c.problem_code
+		and e.subdetail_code = d.subdetail_code
+        and f.problem_code = c.problem_code      
+        and f.problem_code = g.problem_code(+)
+        and a.id = #{id}
+        and a.wno = #{wno}
+	</select>
+	
+	<select id="selectJimoon" resultType="str" parameterType="int">
+		select problem_print
+		from prob_content
+		where problem_code = #{problemCode} - 1    
+	</select>
+	
+	<select id="selectDetailMain" resultType="Wrong" parameterType="map">
+		select a.*, b.exam_name, c.pronum, d.class_name, e.subdetail_name, c.problem_code, f.*
+		from wrong a, exam b, col_exam c, class d, subdetail e, problem f
+		where a.exam_code = b.exam_code 
+		and b.exam_code = c.exam_code
+		and b.class_code = d.class_code
+		and a.problem_code = c.problem_code
+		and e.subdetail_code = d.subdetail_code
+        and f.problem_code = c.problem_code
+        and a.id = #{id}
+        and rownum = 1
+        order by d.class_name, b.exam_name, c.pronum
+	</select>
+	
+	<select id="selectTname" resultType="Wrong" parameterType="int">
+		select d.name, d.id
+		from wrong a, exam b, class c, member d
+		where a.exam_code = b.exam_code
+		and c.class_code = b.class_code
+		and c.id = d.id
+		and b.exam_code = #{examCode}
+	</select>
+	
+	<select id="selectSname" resultType="Wrong" parameterType="map">
+		select b.name
+		from wrong a, member b
+		where a.id = b.id
+		and a.wno = #{wno}
+		and b.id = #{id}
+	</select>
+
+	<update id="updateQuestion" parameterType="map">
+		update wrong
+    	set question = #{question}
+		where wno = #{wno}
+	</update>
+	
+	<update id="updateSolution" parameterType="map">
+		update wrong
+		set content = #{content}
+		where
+		wno = #{wno}
+	</update>
+</mapper>

@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TeacherMas-Mapper">
+	<sql id="search">
+
+		<if test="searchType == 'tcw'.toString()">
+			and name like '%'||#{keyword}||'%'
+
+			or subject like
+			'%'||#{keyword}||'%'
+
+			or phone like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 't'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and subject like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and phone like '%'||#{keyword}||'%'
+		</if>
+
+	</sql>
+
+
+	<select id="selectTeacherList" resultType="teachermas">
+		select
+		*
+		from
+		member
+		where authority='ROLE_TEACHER'
+		order by subject asc
+	</select>
+
+	<select id="selectTeacherListCount" resultType="int">
+		select
+		count(*)
+		from
+		member
+		where authority='ROLE_TEACHER'
+		order by subject asc
+	</select>
+
+	<select id="selectSearchTeacherList" resultType="teachermas">
+		select
+		*
+		from member
+		where id is not null
+		and authority='ROLE_TEACHER'
+		<include refid="search" />
+		order by subject asc
+	</select>
+
+	<select id="selectSearchTeacherListCount" resultType="int">
+		select
+		count(*)
+		from member
+		where id is not null
+		and
+		authority='ROLE_TEACHER'
+		<include refid="search" />
+	</select>
+
+	<update id="insertTeacher" parameterType="teachermas">
+		insert into
+		member(picture,id,name,subject,authority,phone,attend_time,out_times,regDate,timepay,address,detail_address)
+		values(#{picture},#{id},#{name},#{subject},#{authority},#{phone},#{attendTime},#{outTimes},#{regDate},#{timepay},#{address},#{detailAddress})
+	</update>
+
+
+	<select id="selectTeacherById" parameterType="str"
+		resultType="teachermas">
+		select
+		*
+		from member
+		where id=#{id}
+	</select>
+
+	<!-- <select id="selectTeacherByPicture" parameterType="str" resultType="teachermas"> -->
+	<!-- select -->
+	<!-- * -->
+	<!-- from member -->
+	<!-- where picture=#{picture} -->
+	<!-- </select> -->
+
+	<update id="deleteTeacher" parameterType="str">
+		delete
+		from member
+		where
+		id=#{id}
+	</update>
+
+	<select id="selectTeacherSequenceNextValue" resultType="str">
+		select
+		teacher_seq.nextval from dual
+	</select>
+
+	<select id="selectScoreBySubjectName" parameterType="str"
+		resultType="teachermas">
+		select
+		AVG ( a.myscore )
+		from school_score a ,
+		member b ,
+		subject c
+		where
+		a.id=b.id
+		and c.subject_code=a.subject_code
+		and a.regdate
+		LIKE '2022/07%'
+		and b.subject=#{subject}
+	</select>
+
+
+	<select id="selectTeacherByPicture" parameterType="str"
+		resultType="teachermas">
+		select
+		*
+		from member
+		where picture=#{picture}
+	</select>
+
+
+
+
+
+	<sql id="search4">
+
+		<if test="searchType == 'tcw'.toString()">
+			and name like '%'||#{keyword}||'%'
+
+			or phone
+			like'%'||#{keyword}||'%'
+
+
+		</if>
+		<if test="searchType == 't'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+
+		<if test="searchType == 'w'.toString()">
+			and phone like '%'||#{keyword}||'%'
+		</if>
+
+	</sql>
+
+
+	<select id="selectTeacherAttendList" resultType="teachermas">
+		SELECT
+
+		a.name
+		,a.phone
+		,a.attend_time
+		,a.out_times
+		,b.ATTENDANCE_STATUS
+		,b.id
+		FROM
+		member
+		a,
+		attendance b
+		where a.authority='ROLE_TEACHER'
+		and TO_CHAR(b.regDate,
+		'yyyy-mm-dd') = TO_CHAR(to_date(sysdate),
+		'yyyy-mm-dd')
+		and b.id=a.id
+	</select>
+
+	<select id="selectTeacherAttendListCount" resultType="int">
+
+		SELECT
+
+		count(*)
+
+
+
+		FROM
+		member a,
+		attendance b
+		where a.authority='ROLE_TEACHER'
+		and
+		TO_CHAR(b.regDate, 'yyyy-mm-dd') = TO_CHAR(to_date(sysdate),
+		'yyyy-mm-dd')
+		and b.id=a.id
+
+	</select>
+
+	<select id="selectSearchTeacherAttendList"
+		resultType="teachermas">
+		SELECT
+
+		a.name
+		,a.phone
+		,a.attend_time
+		,a.out_times
+		,b.ATTENDANCE_STATUS
+		,b.id
+		FROM
+		member a,
+		attendance b
+		where a.authority='ROLE_TEACHER'
+		and
+		TO_CHAR(b.regDate, 'yyyy-mm-dd') = TO_CHAR(to_date(sysdate),
+		'yyyy-mm-dd')
+		and b.id=a.id
+		<include refid="search" />
+
+	</select>
+
+	<select id="selectSearchTeacherAttendListCount" resultType="int">
+
+
+		SELECT
+		count(*)
+
+
+		FROM
+		member a,
+		attendance b
+		where a.authority='ROLE_TEACHER'
+		and
+		TO_CHAR(b.regDate, 'yyyy-mm-dd') = TO_CHAR(to_date(sysdate),
+		'yyyy-mm-dd')
+		and b.id=a.id
+
+		<include refid="search" />
+	</select>
+
+
+	
+
+	<select id="selectAllAttendTeacherById" resultType="teachermas">
+		SELECT
+
+		b.regdate
+		,b.in_time
+		,b.out_time
+		,b.ATTENDANCE_STATUS
+		FROM
+		member a,
+		attendance b
+		where a.authority='ROLE_TEACHER'
+		and b.id=a.id
+		and b.id=#{id}
+
+		order by b.regdate desc
+
+
+	</select>
+
+<!-- 	<select id="selectAllAttendTeacherAttendByIdListCount" -->
+<!-- 		resultType="int"> -->
+
+<!-- 		SELECT -->
+
+<!-- 		count(*) -->
+
+<!-- 		FROM -->
+<!-- 		member a, -->
+<!-- 		attendance b -->
+<!-- 		where a.authority='ROLE_TEACHER' -->
+<!-- 		and b.id=a.id -->
+<!-- 		and b.id=#{id} -->
+
+<!-- 		order by b.regdate desc -->
+
+<!-- 	</select> -->
+
+<!-- 	<select id="selectSearchAllAttendTeacherByIdList" -->
+<!-- 		resultType="teachermas"> -->
+<!-- 		SELECT -->
+
+<!-- 		b.regdate -->
+<!-- 		,b.in_time -->
+<!-- 		,b.out_time -->
+<!-- 		,b.ATTENDANCE_STATUS -->
+<!-- 		FROM -->
+<!-- 		member a, -->
+<!-- 		attendance b -->
+<!-- 		where a.authority='ROLE_TEACHER' -->
+<!-- 		and b.id=a.id -->
+<!-- 		and b.id=#{id} -->
+<!-- 		order by b.regdate desc -->
+
+
+<!-- 	</select> -->
+
+<!-- 	<select id="selectSearchAllAttendTeacherByIdListCount" -->
+<!-- 		resultType="int"> -->
+
+<!-- 		SELECT -->
+<!-- 		count(*) -->
+
+<!-- 		FROM -->
+<!-- 		member a, -->
+<!-- 		attendance b -->
+<!-- 		where a.authority='ROLE_TEACHER' -->
+<!-- 		and b.id=a.id -->
+<!-- 		and b.id=#{id} -->
+
+<!-- 		order by b.regdate desc -->
+
+
+
+<!-- 	</select> -->
+
+
+	<select id="selectFinalTestBykor" parameterType="str" resultType="teachermas">
+
+		SELECT
+		avg(a.myscore) as avg
+		from school_score a,
+		member b,
+		subject c
+		where c.subject_code=a.subject_code
+		and a.test_name='1학기중간'
+		and c.subject_name=#{subject}
+
+	</select>
+	
+	<select id="selectFinalTestByFisrtFinal" parameterType="str" resultType="teachermas">
+
+		SELECT
+		avg(a.myscore) as avg1
+		from school_score a,
+		member b,
+		subject c
+		where c.subject_code=a.subject_code
+		and a.test_name='1학기기말'
+		and c.subject_name=#{subject}
+
+	</select>
+	
+	<select id="selectFinalTestBySecondMiddle" parameterType="str" resultType="teachermas">
+
+		SELECT
+		avg(a.myscore) as avg2
+		from school_score a,
+		member b,
+		subject c
+		where c.subject_code=a.subject_code
+		and a.test_name='2학기중간'
+		and c.subject_name=#{subject}
+
+	</select>
+	
+	<select id="selectFinalTestBySecondFinal" parameterType="str" resultType="teachermas">
+
+		SELECT
+		avg(a.myscore) as avg3
+		from school_score a,
+		member b,
+		subject c
+		where c.subject_code=a.subject_code
+		and a.test_name='2학기기말'
+		and c.subject_name=#{subject}
+
+	</select>
+
+		<!-- 수업이름가져오기 -->
+	<select id="selectclassName" resultType="teachermas">
+	 	select 
+           a.class_code,
+            a.class_name,
+           b.subject ,
+           b.name
+          
+           from class a,
+           member b
+	 where a.id=b.id
+            and a.id=#{id}
+	
+	
+	
+	</select>
+	
+	<!-- 강사후기selectbox마다 바꾸기 -->
+	<select id="selectReviewListByClassCode" resultType="teachermas">
+	 select 
+             a.class_name,
+            b.name,       
+             c.star_score,
+             c.content
+             from
+             class a,
+             member b,
+             class_review c
+             where c.class_code=a.class_code
+               and b.id=c.id
+               and a.class_code=#{classCode}
+	
+	
+	
+	</select>
+	
+	<!-- 처음에 전체후기 리스트  -->
+	
+	
+	<select id="selectAllReviewListById" resultType="teachermas">
+	 select 
+             a.class_name,
+            b.name,       
+             c.star_score,
+             c.content
+             from
+             class a,
+             member b,
+             class_review c
+             where c.class_code=a.class_code
+               and b.id=c.id
+            and a.id=#{id}
+	
+	
+	
+	</select>
+	
+	<!-- 강사경력 -->
+	<select id="selectTeacherCareer" resultType="teachermas">
+	 select a.cacontent,
+	 		a.start_date,
+	 		a.end_date
+             from
+             career a,
+             member b
+             where b.id=a.id
+            and b.id=#{id}
+             order by a.start_date asc
+	
+	
+	</select>
+	
+	
+	<!-- 전체 평점 평균 -->
+	<select id="selectAllStarById" parameterType="str" resultType="teachermas">
+			select 
+              avg(c.star_score) as avg4
+             from
+             class a,
+             member b,
+             class_review c
+             where c.class_code=a.class_code
+               and b.id=c.id
+            and a.id=#{id}
+           
+	
+	
+	
+	</select>
+	
+	
+		
+	<!-- 전체 classcode에 따른 평점  평균-->
+	<select id="selectAvgByclassCode" parameterType="int" resultType="teachermas">
+			       select 
+              avg(c.star_score) as avg5
+             from
+             class a,
+             member b,
+             class_review c
+             where c.class_code=a.class_code
+               and b.id=c.id
+            and a.class_code=#{classCode}
+	
+	
+	
+	</select>
+	
+	
+	<!--해당강사의 전체 수업 리스트   시작일과 끝나는날 사이에 수업들-->
+	<select id="selectClassTeacheringById" parameterType="str" resultType="teachermas">
+	  select class_code ,
+               class_name,
+               start_date,
+               end_date
+        from class
+       
+         where id=#{id}
+         and to_date(sysdate, 'yyyy/mm/dd hh24:mi:ss') <![CDATA[>=]]>to_date(start_date,'yyyy/mm/dd hh24:mi:ss') 
+         and to_date(sysdate, 'yyyy/mm/dd hh24:mi:ss')<![CDATA[<=]]>to_date(end_date,'yyyy/mm/dd hh24:mi:ss') 
+	</select>
+	
+
+	<select id="selectClassTimeByClassDay" resultType="teachermas">
+	  select min(start_time) as startTime, max(end_time) as endTime
+       from 
+        (select start_time, end_time, classday, ctperiod
+          from time_detail
+        where class_code =#{classCode}
+          and classday =#{classday})
+	
+	</select>
+	
+	<!-- id로 강사 정보 가져오기 -->
+		<select id="selectTeacherAttendDetail" parameterType="str" resultType="teachermas">
+
+		 SELECT
+    distinct
+		a.name
+		,a.phone
+		,a.attend_time
+		,a.out_times
+		FROM
+		member
+		a,
+		attendance b
+		where a.authority='ROLE_TEACHER'
+		and b.id=a.id
+        and b.id=#{id}
+
+	</select>
+	
+	<select id="getMemberPictureSeq" resultType="int">
+		select memberPicture_seq.nextval from dual
+	</select>
+	
+</mapper>

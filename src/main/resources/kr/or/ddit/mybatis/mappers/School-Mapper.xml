@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="School-Mapper">
+  <sql id="search">
+		<if test="searchType == 'n'.toString()">
+			and school_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'r'.toString()">
+			and school_rank like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'l'.toString()">
+			and school_address like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'nrl'.toString()">
+			and (
+			school_name like '%'||#{keyword}||'%'
+			or
+			school_rank like '%'||#{keyword}||'%'						
+			or
+			school_address like '%'||#{keyword}||'%'						
+			)			
+		</if>
+ </sql>
+
+	<select id="selectSearchSchoolList" resultType="school">
+		select
+			school_code
+			,school_name
+			,school_rank
+			,school_url
+			,school_gender
+			,school_address
+		from
+			school_detail
+		where 
+			school_code is not null
+		<include refid="search"/>	
+	</select>
+	
+	<select id="getSchoolDetail" resultType="school">
+		select
+			school_code
+			,school_name
+			,school_rank
+			,school_url
+			,school_gender
+			,school_address
+		from
+			school_detail
+		where school_code = #{schoolCode}
+	</select>
+	
+
+	<select id="selectSearchSchoolListCount" resultType="int">
+		select
+			count(*)
+		from
+			school_detail
+	</select>
+	
+	<select id="studentCnt" resultType="int">
+	 	select count(*) from member where authority = 'ROLE_STUDENT'
+	</select>
+	
+	<select id="schoolCntStudent" resultType="int">
+		select count(*) from member where school_code=#{schoolCode}
+	</select>
+	
+	<update id="removeSchool">
+		delete from school_detail
+		where
+			school_code = #{schoolCode}
+	</update>
+
+	<select id="getSchoolSeq" resultType="int">
+		select school_seq.nextval from dual
+	</select>
+	
+	<update id="insertSchool" parameterType="school">
+		insert into school_detail (
+		    school_code
+		   ,school_name
+		   ,school_rank
+		   ,school_url
+		   ,school_gender
+		   ,school_address
+		) values (
+		    #{schoolCode}
+		   ,#{schoolName}
+		   ,#{schoolRank}
+		   ,#{schoolUrl}
+		   ,#{schoolGender}
+		   ,#{schoolAddress}
+		)
+	</update>
+	
+	<select id="selectMemberList" resultType="member">
+		select
+			id
+			,name
+			,phone
+			,grade
+		from
+			member
+		where authority='ROLE_STUDENT'
+	</select>
+	
+	<select id="selectMemberBySchoolCode" resultType="member">
+		select
+		    id
+		   ,name
+		   ,phone
+		   ,grade
+		from
+		    member
+		where school_code=#{schoolCode}
+		  and authority='ROLE_STUDENT'
+	</select>
+	
+	<select id="selectScoreGradeById" resultType="schoolscore">
+		select
+			id
+			,myscore
+			,mygrade
+		from
+			school_score
+		where id = #{id}
+	</select>
+	
+	<select id="selectSubjectList" resultType="subject">
+		select
+			subject_code
+			,subject_name
+		from
+			subject
+		where subject_code>0
+	</select>
+	
+	<select id="selectSchoolScoreListBySchoolCode" resultType="schoolscore">
+	select 
+		d.subject_code
+		,d.subject_name
+		,c.myscore
+		,b.school_name
+		,b.school_code
+	 from member a, school_detail b, school_score c, subject d
+	where a.school_code = b.school_code
+	  and a.id = c.id
+	  and c.subject_code=d.subject_code
+	  and b.school_code=#{schoolCode}
+	  and d.subject_code=#{subjectCode}
+	</select>
+	
+	
+	<select id="selectSchoolScoreListById" resultType="schoolscore">
+	select 
+		d.subject_code
+		,d.subject_name
+		,c.myscore
+		,b.school_name
+		,b.school_code
+	 from member a, school_detail b, school_score c, subject d
+	where a.school_code = b.school_code
+	  and a.id = c.id
+	  and c.subject_code=d.subject_code
+	  and b.school_code=#{schoolCode}
+	  and d.subject_code=#{subjectCode}
+	  and a.id=#{id}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

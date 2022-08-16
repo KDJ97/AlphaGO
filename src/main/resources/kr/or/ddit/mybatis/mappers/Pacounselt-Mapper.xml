@@ -1,0 +1,886 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Pacounselt-Mapper">
+	<sql id="search">
+		<if test="searchType == 'tcw'.toString()">
+			and name like '%'||#{keyword}||'%'
+
+			or purpose like
+			'%'||#{keyword}||'%'
+
+		</if>
+		<if test="searchType == 't'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and purpose like '%'||#{keyword}||'%'
+		</if>
+
+	</sql>
+
+	<sql id="search4">
+		<if test="searchType == 'a'.toString()">
+			and purpose like '%'||#{keyword}||'%'
+
+			or name like  '%'||#{keyword}||'%'
+
+			or meetdate like '%'||#{keyword}||'%'
+
+		</if>
+		<if test="searchType == 'b'.toString()">
+			and purpose like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+
+		<if test="searchType == 'd'.toString()">
+			and meetdate like '%'||#{keyword}||'%'
+		</if>
+
+	</sql>
+
+
+	<select id="selectCounseltList" resultType="pacounselt">
+
+		select
+		pc_code
+		,counselor
+		,client
+		,regdate
+		,meetdate
+		,content
+		,result
+		,purpose
+		,status
+		,fu_code
+		,su_code
+		,tu_code
+		,pc_start
+		,pc_end
+		,title
+		from
+		pacounselt
+		where
+		status='0'
+		order by meetdate
+		asc
+
+	</select>
+
+	<select id="selectCounseltListCount" resultType="int">
+		select
+		count(*)
+		from
+		pacounselt
+		where status='0'
+		order by meetdate asc
+	</select>
+
+	<select id="selectSearchCounseltList" resultType="pacounselt">
+		select
+		*
+		from pacounselt
+		where pc_code is not null
+		and status='0'
+		<include refid="search" />
+		order by meetdate asc
+	</select>
+
+	<select id="selectSearchCounseltListCount" resultType="int">
+		select
+		count(*)
+		from pacounselt
+		where pc_code is not null
+		and status='0'
+		<include refid="search" />
+	</select>
+
+
+
+
+	<select id="selectCounseltEndList" resultType="pacounselt">
+
+		select
+		pc_code
+		,counselor
+		,client
+		,regdate
+		,meetdate
+		,content
+		,result
+		,purpose
+		,status
+		,fu_code
+		,su_code
+		,tu_code
+		,pc_start
+		,pc_end
+		,title
+		FROM
+		pacounselt
+		where<![CDATA[meetdate <sysdate]]>
+		order by meetdate desc
+	</select>
+
+
+
+	<select id="selectCounseltEndListCount" resultType="int">
+		select
+		count(*)
+		from
+		pacounselt
+		where<![CDATA[meetdate<sysdate]]>
+		order by meetdate desc
+	</select>
+
+	<select id="selectSearchCounseltEndList" resultType="pacounselt">
+		select
+		*
+		from pacounselt
+		where pc_code is not null
+		and <![CDATA[meetdate<sysdate]]>
+		<include refid="search4" />
+		order by meetdate desc
+	</select>
+
+	<select id="selectSearchCounseltEndListCount" resultType="int">
+		select
+		count(*)
+		from pacounselt
+		where pc_code is not null
+		and <![CDATA[meetdate<sysdate]]>
+		<include refid="search4" />
+	</select>
+
+	<select id="selectCounseltByPcCode" parameterType="int"
+		resultType="pacounselt">
+		select
+		a.client,a.content,a.result,a.purpose,a.pc_start,a.pc_end,a.meetdate,
+		b.name,b.phone,b.grade,b.school_name,b.parent_phone,a.pc_code
+		from
+		pacounselt a,
+		member b
+		where a.client=b.id
+		and a.pc_code=#{pcCode}
+	</select>
+
+	<update id="updateCounseltDetailList" parameterType="pacounselt">
+		update
+		pacounselt
+		set 
+		result =#{result},
+		status='1'
+		where
+		pc_code =#{pcCode}
+	</update>
+
+	<select id="selectName" resultType="str">
+		select b.name
+		from
+		pacounselt
+		a,
+		member b
+		where a.client=b.id
+		and
+		a.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectId" resultType="str">
+		select b.id
+		from
+		pacounselt
+		a,
+		member b
+		where a.client=b.id
+		and
+		a.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectFuUniv" resultType="str">
+		select c.university_name
+		from pacounselt a,
+		sh_univ b,
+		university c
+		where c.univ_code=b.univ_code1
+		and a.client=b.id
+		and a.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectPacounseltByPcCode" parameterType="int"
+		resultType="pacounselt">
+
+		select c.university_name
+
+		from
+		pacounselt a,
+		member b,
+		university c,
+		sh_univ d
+		where a.client=b.id
+		and
+		c.univ_code=d.univ_code1
+		and d.id=b.id
+		and a.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectPacounseltByPcCode2" parameterType="int"
+		resultType="pacounselt">
+
+		select c.university_name
+
+		from
+		pacounselt a,
+		member b,
+		university c,
+		sh_univ d
+		where a.client=b.id
+		and
+		c.univ_code=d.univ_code2
+		and d.id=b.id
+		and a.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectPacounseltByPcCode3" parameterType="int"
+		resultType="pacounselt">
+
+		select c.university_name
+
+		from
+		pacounselt a,
+		member b,
+		university c,
+		sh_univ d
+		where a.client=b.id
+		and
+		c.univ_code=d.univ_code3
+		and d.id=b.id
+		and a.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectSuUniv" resultType="str">
+		select c.university_name
+		from pacounselt a,
+		sh_univ b,
+		university c
+		where c.univ_code=b.univ_code2
+		and a.client=b.id
+		and a.pc_code=#{pcCode}
+	</select>
+
+
+
+	<select id="selectPacounseltByPcCode4" parameterType="int"
+		resultType="pacounselt">
+		select a.university_name
+		from university a,
+		pacounselt b
+		where a.univ_code=b.fu_code
+		and b.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectPacounseltByPcCode5" parameterType="int"
+		resultType="pacounselt">
+		select a.university_name
+		from university a,
+		pacounselt b
+		where a.univ_code=b.su_code
+		and b.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectPacounseltByPcCode6" parameterType="int"
+		resultType="pacounselt">
+		select a.university_name
+		from university a,
+		pacounselt b
+		where a.univ_code=b.tu_code
+		and b.pc_code=#{pcCode}
+	</select>
+
+
+	<select id="selectSchoolnaesin" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		pacounselt b
+		where a.univ_code=b.fu_code
+		and
+		b.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectSchoolnaesin2" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		pacounselt b
+		where a.univ_code=b.su_code
+		and
+		b.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectSchoolnaesin3" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		pacounselt b
+		where a.univ_code=b.tu_code
+		and
+		b.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectSchoolnaesin4" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		sh_univ b,
+		pacounselt c
+		where a.univ_code=b.univ_code1
+		and c.client=b.id
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectSchoolnaesin5" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		sh_univ b,
+		pacounselt c
+		where a.univ_code=b.univ_code2
+		and c.client=b.id
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectSchoolnaesin6" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		sh_univ b,
+		pacounselt c
+		where a.univ_code=b.univ_code3
+		and c.client=b.id
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectStudentGrade" parameterType="int"
+		resultType="pacounselt">
+		select avg(a.mygrade) as stuavg
+		from school_score a,
+		pacounselt b
+		where
+		a.id=b.client
+		and b.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectStudentPhone" resultType="str">
+		select b.phone
+		from
+		pacounselt a,
+		member b
+		where a.client=b.id
+		and
+		a.pc_code=#{pcCode}
+	</select>
+
+
+	<!-- 하향대학 -->
+	<select id="selectLowUniversity" resultType="pacounselt">
+		select
+		a.university_name
+
+		from university a,
+		school_score b,
+		pacounselt c
+		where
+		b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)>1.2
+	and
+	<![CDATA[
+		    rownum <= 3
+			]]>
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<!-- 적정대학 -->
+	<select id="selectPosibleUniversity" resultType="pacounselt">
+		select
+		a.university_name
+		from university a,
+		school_score b,
+		pacounselt c
+		where
+		b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)between
+		0.8 and 1.2
+		and
+			<![CDATA[
+
+		     rownum <= 3
+			]]>
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<!-- 상향대학 -->
+	<select id="selectOverUniversity" resultType="pacounselt">
+		select a.university_name
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)<![CDATA[<0.8]]>
+		<![CDATA[
+		    and rownum <= 3
+			]]>
+		and c.pc_code=#{pcCode}
+	</select>
+
+
+	<select id="selectFisrtHighSchool" parameterType="int"
+		resultType="pacounselt">
+
+		select a.university_name
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)<![CDATA[<0.8]]>
+		and rownum=1
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectScoreHighSchool" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)<![CDATA[<0.8]]>
+		and rownum=1
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectFisrtPosibleSchool" parameterType="int"
+		resultType="pacounselt">
+
+		select a.university_name
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)between
+		0.8 and 1.2
+		and rownum=1
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectFisrtPosibleScoreSchool" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)between
+		0.8 and 1.2
+		and rownum=1
+		and c.pc_code=#{pcCode}
+	</select>
+
+
+	<select id="selectFisrtDownSchool" parameterType="int"
+		resultType="pacounselt">
+
+		select a.university_name
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)>1.2
+		and rownum=1
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectFisrtDownScoreSchool" parameterType="int"
+		resultType="pacounselt">
+
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)>1.2
+		and rownum=1
+		and c.pc_code=#{pcCode}
+	</select>
+
+	<select id="selectSecondHighSchool" parameterType="int"
+		resultType="pacounselt">
+		select *
+		from(
+		select rownum as rnum,SearchNoticeResult.*
+		from (
+		select
+		a.university_name
+		from university a,
+		school_score b,
+		pacounselt c
+		where
+		b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)between
+		0.8 and 1.2
+
+		and c.pc_code=#{pcCode}
+		) SearchNoticeResult
+		   <![CDATA[
+		    where rownum <= 2
+			]]>
+		)
+	 <![CDATA[
+		where rnum > 1
+		]]>
+	</select>
+
+
+
+
+	<select id="selectSecondScorePossibleSchool" parameterType="int"
+		resultType="pacounselt">
+
+		select *
+		from(
+		select rownum as rnum,SearchNoticeResult.*
+		from (
+		select
+		a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)between
+		0.8 and 1.2
+
+		and c.pc_code=#{pcCode}
+		) SearchNoticeResult
+
+		  <![CDATA[
+		    where rownum <= 2
+			]]>
+		)
+	 <![CDATA[
+		where rnum > 1
+		]]>
+
+	</select>
+
+
+	<select id="selectThirdPossibleSchool" parameterType="int"
+		resultType="pacounselt">
+		select *
+		from(
+		select rownum as rnum,SearchNoticeResult.*
+		from (
+		select
+		a.university_name,a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)between
+		0.8 and 1.2
+
+		and c.pc_code=#{pcCode}
+		) SearchNoticeResult
+		  <![CDATA[
+		    where rownum <= 3
+		 	]]>
+		)
+	<![CDATA[
+		where rnum > 2
+		]]>
+
+
+	</select>
+
+	<select id="selectSecondOverSchool" parameterType="int"
+		resultType="pacounselt">
+		select *
+		from(
+		select rownum as rnum,SearchNoticeResult.*
+		from (
+		select
+		a.university_name,a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)<![CDATA[<0.8]]>
+
+		and c.pc_code=#{pcCode}
+		) SearchNoticeResult
+		    <![CDATA[
+		    where rownum <= 2
+			]]>
+		)
+	  <![CDATA[
+		where rnum > 1
+		]]>
+	</select>
+
+
+	<select id="selectThirdOverSchool" parameterType="int"
+		resultType="pacounselt">
+		select *
+		from(
+		select rownum as rnum,SearchNoticeResult.*
+		from (
+		select
+		a.university_name,a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)<![CDATA[<0.8]]>
+
+		and c.pc_code=#{pcCode}
+		) SearchNoticeResult
+		      <![CDATA[
+
+		    where rownum <= 3
+		]]>
+		)
+	<![CDATA[
+		where rnum > 2
+		]]>
+	</select>
+
+
+	<select id="selectSecondDownSchool" parameterType="int"
+		resultType="pacounselt">
+		select *
+		from(
+		select rownum as rnum,SearchNoticeResult.*
+		from (
+		select
+		a.university_name,a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)>1.2
+
+		and c.pc_code=#{pcCode}
+		) SearchNoticeResult
+		   <![CDATA[
+		    where rownum <= 2
+		]]>
+		)
+		   <![CDATA[
+		where rnum > 1
+		]]>
+	</select>
+
+
+	<select id="selectThirdDownSchool" parameterType="int"
+		resultType="pacounselt">
+		select *
+		from(
+		select rownum as rnum,SearchNoticeResult.*
+		from (
+		select
+		a.university_name,a.university_kor,a.university_eng,a.university_math,a.university_social,a.university_science
+		from university a,
+		school_score b,
+		pacounselt c
+		where b.id=client
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)>1.2
+
+		and c.pc_code=#{pcCode}
+		) SearchNoticeResult
+		   <![CDATA[
+		    where rownum <= 3
+		]]>
+		)
+		   <![CDATA[
+		where rnum > 2
+		]]>
+	</select>
+
+
+
+
+<!-- 	<update id="insertCalender" parameterType="pacounselt"> -->
+<!-- 		UPDATE pacounselt -->
+<!-- 		SET -->
+
+<!-- 		client=#{client} -->
+<!-- 		meetdate=#{meetDate} -->
+<!-- 		status='1' -->
+<!-- 		pc_start=#{pcStart} -->
+<!-- 		pc_end=#{pcEnd} -->
+<!-- 		title=#{title} -->
+<!-- 		WHERE -->
+<!-- 		pc_code =#{pcCode} -->
+<!-- 	</update> -->
+
+
+	<update id = "insertCalender" parameterType="pacounselt">
+
+<!--   	  	update -->
+<!-- 		pacounselt -->
+<!-- 		set  -->
+<!-- 		pc_start=#{pcStart}, -->
+<!-- 		pc_end=#{pcEnd}, -->
+<!-- 		title=#{title} -->
+<!-- 		status='1' -->
+<!-- 		where -->
+<!-- 		pc_code =#{pcCode} -->
+
+  	  	update
+		pacounselt
+		set
+
+		status='1'
+		where
+		pc_code =#{pcCode}
+
+ 	</update>
+
+ 	<select id="selectPacounseltBypcCodeStatus" parameterType="int" resultType="pacounselt">
+		select *
+		from pacounselt
+		where status='1'
+
+		 and pc_code=#{pcCode}
+
+	</select>
+
+
+	<select id="selectCounseltListstatus" resultType="pacounselt">
+
+		select
+		pc_code
+		,counselor
+		,client
+		,regdate
+		,meetdate
+		,content
+		,result
+		,purpose
+		,status
+		,fu_code
+		,su_code
+		,tu_code
+		,pc_start
+		,pc_end
+		,title
+		from
+		pacounselt
+		where
+		status='1'
+		order by meetdate
+		desc
+
+	</select>
+
+	<update id="deletePacounselt" parameterType="int" >
+		delete
+		from pacounselt
+		where pc_code=#{pcCode}
+	</update>
+
+
+	<update id = "modifyCalender" parameterType="pacounselt">
+
+		update pacounselt
+		set
+
+
+		  meetdate=#{meetDate},
+		  pc_start=#{pcStart},
+		  pc_end=#{pcEnd}
+		where
+		pc_code =#{pcCode}
+
+ 	</update>
+
+ 		<update id="updateDelayCounselt">
+		update pacounselt
+		set
+		status = '2'
+		where
+		pc_code =#{pcCode}
+	</update>
+
+	<select id="selectNextSeq" resultType="int">
+		select pacon_seq.nextval from dual
+	</select>
+
+	<update id="intsertPacounselt" parameterType="pacounselt">
+		insert into pacounselt (
+		    pc_code
+		   ,counselor
+		   ,client
+		   ,meetdate
+		   ,purpose
+		   ,fu_code
+		   ,su_code
+		   ,tu_code
+		   ,pc_start
+		   ,pc_end
+		   ,title
+		   ,regdate
+		   ,content
+		) values (
+		    #{pcCode}
+		   ,#{counSelor}
+		   ,#{client}
+		   ,#{meetDate}
+		   ,#{purpose}
+		   ,#{fuCode}
+		   ,#{suCode}
+		   ,#{tuCode}
+		   ,#{pcStart}
+		   ,#{pcEnd}
+		   ,#{title}
+		   ,sysdate
+		   ,#{content}
+		)
+	</update>
+
+</mapper>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Student-Mapper">
+	<sql id="search">
+	<if test="searchType == 'tcw'.toString()">
+			and name like '%'||#{keyword}||'%'
+			
+			or school_name like '%'||#{keyword}||'%'
+			
+			or phone like '%'||#{keyword}||'%'
+			
+			or grade like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 't'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and school_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and phone like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'n'.toString()">
+			and grade like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+
+
+	<select id="selectStudentList" resultType="student">
+		select
+		*
+		from
+		member
+		where authority='ROLE_STUDENT'
+		order by grade asc
+	</select>
+	
+	<select id="selectStudentListCount" resultType="int">
+		select 
+		count(*)
+		from
+		member
+			where authority='ROLE_STUDENT'
+		 	order by grade asc	
+	</select>
+
+	<select id="selectSearchStudentList" resultType="student">
+		select
+		* 
+		from member
+		 where id is not null 
+		  and authority='ROLE_STUDENT'
+		<include refid="search" />
+		order by grade asc
+	</select>
+	
+	<select id="selectSearchStudentListCount" resultType="int">
+		select
+		count(*) 
+		from member
+		where id is not null 
+	    and authority='ROLE_STUDENT'
+		<include refid="search" />
+	</select>
+	
+	
+
+
+
+
+
+	<select id="selectStudentById" parameterType="str" resultType="student">
+	
+		select * 
+		from member
+		where id=#{id}
+		
+		
+       
+       
+<!--          SELECT -->
+<!--     b.id -->
+<!--    ,b.name -->
+<!--    ,b.regdate -->
+<!--    ,b.pwd -->
+<!--    ,b.email -->
+<!--    ,b.picture -->
+<!--    ,b.phone -->
+<!--    ,b.address -->
+<!--    ,b.authority -->
+<!--    ,b.enabled -->
+<!--    ,b.parent_phone -->
+<!--    ,b.age -->
+<!--    ,b.grade -->
+<!--    ,b.school_code -->
+<!--    ,b.register -->
+<!--    ,b.subject -->
+<!--    ,b.major -->
+<!--    ,b.parent_name -->
+<!--    ,b.school_name -->
+<!--    ,b.attend_time -->
+<!--    ,b.out_time -->
+<!--    ,b.birthday -->
+<!--    ,a.university_name -->
+<!--       from university a, -->
+<!--         member b, -->
+<!--         sh_univ c -->
+<!--          where a.univ_code=c.univ_code1 -->
+<!--          and c.id=b.id -->
+<!--        and b.id=#{id} -->
+       
+	</select>
+	
+	<select id="selectStudentByPicture" parameterType="str" resultType="student">
+		select
+		*
+		from member
+		where picture=#{picture}
+	</select>
+	
+	<update id="deleteStudent" parameterType="str" >
+		delete
+		from member
+		where id=#{id}
+	</update>
+	
+	<select id="selectStudentSequenceNextValue" resultType="str">
+		select student_seq.nextval from dual
+	</select>
+	
+	
+<!-- 희망대학찾기 -->
+<!-- 	<select id="selectFuUniversity" resultType="str"> -->
+<!-- 		select a.university_name -->
+<!--         from university a, -->
+<!--         member b, -->
+<!--         sh_univ c -->
+<!--         where a.univ_code=c.univ_code1 -->
+<!--        and b.id=#{id} -->
+<!-- 	</select> -->
+	
+	
+	<update id="insertStudent" parameterType="student">
+	insert into member(
+    picture
+    ,id
+    ,name
+    ,authority
+    ,school_name
+    ,grade
+    ,phone
+    ,parent_name
+    ,parent_phone
+    ,regDate
+    ,school_code
+    ,address
+    ,detail_address)
+values(
+     #{picture}
+    , #{id,jdbcType=VARCHAR}
+    ,#{name,jdbcType=VARCHAR}
+    ,#{authority,jdbcType=VARCHAR}
+     ,(
+    select school_name
+        from school_detail
+       where school_name like '%'||#{schoolName}||'%'
+    )
+    ,#{grade,jdbcType=VARCHAR}
+    ,#{phone,jdbcType=VARCHAR}
+    ,#{parentName, jdbcType=VARCHAR}
+    ,#{parentPhone, jdbcType=VARCHAR}
+    ,to_date(sysdate)
+    ,(select school_code
+        from school_detail
+       where school_name like '%'||#{schoolName}||'%'
+    )
+    ,#{address}
+    ,#{detailAddress}
+    
+)  
+	
+	
+	</update>
+	
+
+<select id="selectHopeSchool" resultType="student">
+
+		 select a.university_name
+        from university a,
+      
+        sh_univ c
+         where a.univ_code=c.univ_code1
+           or a.univ_code=c.univ_code2
+           or a.univ_code=c.univ_code3
+           
+         and c.id=#{id}
+	</select>
+	
+	
+	
+	<select id="selectFirstHopeSchool" parameterType="str" resultType="student">
+
+		   SELECT a.university_name
+        from university a,
+        member b,
+        sh_univ c
+         where a.univ_code=c.univ_code1 
+         and b.id=c.id 
+         and b.id=#{id}
+	</select>
+	
+	<select id="getMemberPictureSeq" resultType="int">
+		select memberPicture_seq.nextval from dual
+	</select>
+	
+
+</mapper>
+

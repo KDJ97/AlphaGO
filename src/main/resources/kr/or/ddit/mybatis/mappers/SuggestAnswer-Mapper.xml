@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SuggestAnswer-Mapper">
+	
+	<select id="selectSuggestAnswerSeqNextValue" resultType="int" >
+		select suggestanswer_seq.nextval
+		from dual		
+	</select>
+	
+	<select id="selectSuggestAnswerList" resultType="suggestAnswer">
+		select a.*,b.name 
+		  from suggest_answer a, member b
+		where lcode=#{lcode}
+        and a.answerer=b.id
+		order by col asc
+	</select>
+	
+	<select id="countSuggestAnswer" resultType="int">
+		select count(lcode) 
+		from suggest_answer
+		where lcode=#{lcode}
+	</select>
+	
+	<update id="insertSuggestAnswer" parameterType="suggestAnswer" >
+		insert into suggest_answer(col,lcode,answer,answerer,regdate)
+		values(#{col},#{lcode},#{answer},#{answerer},sysdate)
+	</update>
+	
+<!-- 	<update id="updateSuggestAnswer" parameterType="suggestAnswer"> -->
+<!-- 		update suggest_answer  -->
+<!-- 		set  -->
+<!-- 		answer=#{answer}, -->
+<!-- 		updatedate=sysdate -->
+<!-- 		where col=#{col}		 -->
+<!-- 	</update> -->
+	
+	<update id="deleteSuggestAnswer" parameterType="int">
+		delete from suggest_answer
+		where col=#{col}		
+	</update>	
+</mapper>

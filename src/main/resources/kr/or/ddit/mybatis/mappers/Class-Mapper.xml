@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Class-Mapper">
+  <sql id="search">
+		<if test="searchType == 'n'.toString()">
+			and a.class_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 's'.toString()">
+			and c.subject_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'nst'.toString()">
+			and (
+			a.class_name like '%'||#{keyword}||'%'
+			or
+			c.subject_name like '%'||#{keyword}||'%'
+			)
+		</if>
+	</sql>
+	<sql id="searchAppList">
+	  <if test="keyword != null">
+	  	and class_name like '%'||#{keyword}||'%'
+	  </if>
+	</sql>
+
+	<select id="getClassing" resultType="classing" parameterType="string">
+		select
+		    a.class_name, a.start_date, a.end_date, b.class_code
+		from
+		    class a, class_ing b
+		where a.class_code = b.class_code
+		  and b.id=#{id}
+		order by a.subdetail_code
+	</select>
+
+	<select id="selectSearchClassList" resultType="class">
+               select
+                   a.class_code
+                  ,a.class_rank
+                  ,a.class_name
+                  ,a.id
+                  ,a.subdetail_code
+                  ,a.cpno
+                  ,a.start_date
+                  ,a.end_date
+                  ,a.stu_cnt
+                  ,a.class_price
+                  ,a.total_time
+                  ,a.class_grade
+                  ,b.subdetail_name
+                  ,b.subject_code
+                  ,c.subject_name
+               from
+                   class a, subdetail b, subject c
+               where a.subdetail_code = b.subdetail_code
+                 and b.subject_code=c.subject_code
+                 and a.cpcheck = '3'
+               	<include refid="search" />
+               order by b.subdetail_name
+	</select>
+
+	<select id="selectSearchClassListInClassList" resultType="class">
+                select
+                    a.class_code
+                   ,a.class_rank
+                   ,a.class_name
+                   ,a.id
+                   ,a.subdetail_code
+                   ,a.cpno
+                   ,a.start_date
+                   ,a.end_date
+                   ,a.class_price
+                   ,a.total_time
+                   ,a.class_grade
+                   ,b.subdetail_name
+                   ,b.subject_code
+                   ,c.subject_name
+                   ,d.name
+                from
+                    class a, subdetail b, subject c, member d
+                where a.subdetail_code = b.subdetail_code
+                  and b.subject_code=c.subject_code
+                  and a.id = d.id
+                  and a.cpcheck = '3'
+                	<include refid="search" />
+                order by a.end_date desc
+	</select>
+
+	<select id="selectClassIngMemberList" resultType="classing">
+		select
+		       class_code
+		      ,id
+		 from
+		      class_ing
+		where class_code = #{classCode}
+	</select>
+
+	<select id="selectSearchClassListCount" resultType="int">
+		select
+		count(*)
+		from class a, subdetail b, subject c
+		where a.subdetail_code = b.subdetail_code
+		and b.subject_code=c.subject_code
+		and a.cpcheck = '3'
+		<include refid="search" />
+	</select>
+
+	<select id="getClassDetail" resultType="class">
+		select
+			a.class_code
+			,a.class_rank
+			,a.class_name
+			,a.id
+			,a.subdetail_code
+			,a.cpno
+			,a.start_date
+			,a.end_date
+			,a.stu_cnt
+			,a.class_price
+			,a.total_time
+			,a.class_grade
+			,b.subdetail_name
+			,b.subject_code
+			,c.subject_name
+			,d.name
+		from
+			class a, subdetail b, subject c, member d
+		where a.subdetail_code = b.subdetail_code
+		  and b.subject_code=c.subject_code
+		  and a.id=d.id
+		  and a.class_code = #{classCode}
+	</select>
+
+	<select id="getSubDetail" resultType="subject">
+		select *
+		from subdetail
+		where subject_code = #{target}
+	</select>
+
+	<select id="getClassCode" resultType="int">
+		select classcode_seq.nextval from dual
+	</select>
+
+	<update id="registClass" parameterType="class">
+		insert into class (
+			class_code
+			,class_rank
+			,class_name
+			,id
+			,subdetail_code
+			,start_date
+			,end_date
+			,stu_cnt
+			,class_price
+			,total_time
+			,class_grade
+		) values (
+			#{classCode}
+			,#{classRank}
+			,#{className}
+			,#{id}
+			,#{subdetailCode}
+			,#{startDate}
+			,#{endDate}
+			,#{stuCnt}
+			,#{classPrice}
+			,#{totalTime}
+			,#{classGrade}
+		)
+	</update>
+
+	<update id="removeClass" parameterType="class">
+		delete from class
+		 where class_code = #{classCode}
+	</update>
+
+	<select id="getTeacherList" resultType="member">
+		select
+		id
+		,name
+		,enabled
+		,phone
+		,subject
+		,major
+		from
+		member
+		where id is not null
+		and subject like '%'||#{subjectName}||'%'
+	</select>
+
+	<select id="getTeacherById" resultType="member">
+		select
+		id
+		,name
+		,enabled
+		,phone
+		,subject
+		,major
+		from
+		member
+		where id is not null
+		and id = #{id}
+	</select>
+
+	<select id="getTeacherByClassCode" resultType="member">
+		select b.id
+			,a.name
+			,a.subject
+			,a.major
+			,a.phone
+			,a.timepay
+		from member a, class b
+		where a.id=b.id
+		  and b.class_code=#{classCode}
+	</select>
+
+	<select id="getCertificate" resultType="certificate">
+		select
+			cer_code
+			,id
+			,cer_name
+		from certificate
+		where id = #{id}
+	</select>
+
+	<select id="selectClassReviewById" resultType="classreview">
+		select
+			review_code
+			,star_score
+			,class_code
+			,id
+			,content
+		from
+			class_review
+		where
+			id=#{id}
+	</select>
+
+	<select id="getUseRoomTime" resultType="useroom">
+		select
+		    a.class_code
+		   ,a.id
+		   ,a.start_date
+		   ,a.end_date
+		   ,a.total_time
+		   ,b.time_code
+		   ,b.room_code
+		   ,b.start_time
+		   ,b.end_time
+		   ,b.classday
+		   ,b.ctperiod
+		from
+		    class a, time_detail b
+		where a.class_code = b.class_code
+		 <![CDATA[
+		  and to_date(start_date)<=to_date(sysdate)
+          and to_date(end_date)>=to_date(sysdate)]]>
+		  and room_code = #{roomCode}
+	</select>
+
+	<update id="updateClassOpen">
+		update class
+		   set
+			   id =#{id}
+			   ,start_date =#{startDate}
+		       ,end_date =#{endDate}
+			   ,total_time =#{totalTime}
+		 where
+			   class_code = #{classCode}
+	</update>
+
+	<update id="registTimeDetail">
+		insert into time_detail (
+		    time_code
+		   ,room_code
+		   ,start_time
+		   ,end_time
+		   ,class_code
+		   ,classday
+		   ,ctperiod
+		) values (
+		    #{timeCode}
+		   ,#{roomCode}
+		   ,#{startTime}
+		   ,#{endTime}
+		   ,#{classCode}
+		   ,#{classday}
+		   ,#{ctperiod}
+		)
+	</update>
+
+	<select id="getTimedetailSeq" resultType="int">
+		select timedetail_seq.nextval from dual
+	</select>
+
+	<select id="selectClassTimeDetail" resultType="timeDetail">
+	   select
+			    a.time_code
+			   ,a.room_code
+			   ,a.start_time
+			   ,a.end_time
+			   ,a.class_code
+			   ,a.classday
+			   ,a.ctperiod
+			   ,b.room_no
+		 from
+		       time_detail a, classroom b
+	    where  a.room_code = b.room_code
+		  and  class_code = #{classCode}
+		order by a.classday
+	</select>
+
+	<select id="selectSchoolDetail" resultType="member">
+		select
+			a.id, a.name, a.grade, b.school_name
+		from
+			member a, school_detail b
+		where
+			a.school_code = b.school_code
+			and id = #{id}
+	</select>
+
+	<select id="getCareer" resultType="career">
+		select
+			career_code
+			,cacontent
+			,start_date
+			,end_date
+			,id
+		from
+			career
+		where id=#{id}
+	</select>
+	<select id="selectClassReview" resultType="classreview">
+		select
+			a.class_name,
+			b.name,
+			c.star_score,
+			c.content
+		from
+			class a,
+			member b,
+			class_review c
+		where c.class_code=a.class_code
+			  and b.id=c.id
+			  and a.class_code=#{classCode}
+	</select>
+
+	<select id="selectClassingByClassCode" resultType="classing">
+	select a.id, a.class_code, a.class_regdate, b.name
+	  from class_ing a, member b
+	 where a.id=b.id
+	   and class_code=#{classCode}
+	</select>
+
+	<select id="selectAssignByDate" resultType="assign">
+	select assign_code, class_code, start_date, end_date
+	  from assign
+	 where class_code=#{classCode}
+	    <![CDATA[
+	   and start_date >= to_date(#{classRegdate},'yyyy/MM/dd HH24:MI:SS')
+	   ]]>
+	</select>
+
+	<select id="selectAssignAttachCheckCount" resultType="int">
+		select count(*)
+	 	  from assign_attach
+		 where assign_code=#{assignCode}
+	  	   and id=#{id}
+	</select>
+
+	<select id="selectExamScoreById" resultType="academyScore">
+	select b.academy_score
+	  from exam a, academy_score b
+	 where a.exam_code = b.exam_code
+	   and a.class_code = #{classCode}
+	   and b.id=#{id}
+	</select>
+
+	<select id="getTotalTimeByClassCode" resultType="class">
+	select total_time
+		  ,class_price
+	  from class
+	 where class_code=#{classCode}
+	</select>
+
+
+	<select id="selectClassByEndDate" resultType="class">
+		select
+			a.class_code
+			,a.class_rank
+			,a.class_name
+			,a.id
+			,a.subdetail_code
+			,a.cpno
+			,a.start_date
+			,a.end_date
+			,a.stu_cnt
+			,a.class_price
+			,a.total_time
+			,a.class_grade
+			,b.subdetail_name
+			,b.subject_code
+			, c.subject_name
+		from
+			class a, subdetail b, subject c
+		where a.subdetail_code = b.subdetail_code
+		  and b.subject_code=c.subject_code
+		  <![CDATA[
+          and to_date(a.end_date, 'yyyy/MM/dd HH24:MI:SS')>=to_date(sysdate,'yyyy/MM/dd HH24:MI:SS')
+          ]]>
+          order by a.end_date
+	</select>
+
+	<select id="selectClassByStartDate" resultType="class">
+		select
+			a.class_code
+			,a.class_rank
+			,a.class_name
+			,a.id
+			,a.subdetail_code
+			,a.cpno
+			,a.start_date
+			,a.end_date
+			,a.stu_cnt
+			,a.class_price
+			,a.total_time
+			,a.class_grade
+			,b.subdetail_name
+			,b.subject_code
+			, c.subject_name
+		from
+			class a, subdetail b, subject c
+		where a.subdetail_code = b.subdetail_code
+		  and b.subject_code=c.subject_code
+		  <![CDATA[
+          and to_date(a.start_date, 'yyyy/MM/dd HH24:MI:SS')>=to_date(sysdate,'yyyy/MM/dd HH24:MI:SS')
+          ]]>
+          order by a.start_date
+	</select>
+
+	<select id="selectTimeDetailByClassCode" resultType="timeDetail">
+		select
+			b.time_code
+			, b.classday
+			, b.ctperiod
+			, c.class_code
+			, c.start_date
+			, c.end_date
+			, b.start_time
+			, b.end_time
+		 from time_detail b, class c
+		where b.class_code = c.class_code
+          and b.class_code=#{classCode}
+          <![CDATA[
+          and to_date(c.end_date, 'yyyy/MM/dd HH24:MI:SS')>=to_date(sysdate,'yyyy/MM/dd HH24:MI:SS')
+          and to_date(c.start_date, 'yyyy/MM/dd HH24:MI:SS')<=to_date(sysdate,'yyyy/MM/dd HH24:MI:SS')
+          ]]>
+	</select>
+
+	<select id="selectEndClassCode" resultType="str">
+	select class_code
+	from class
+	where
+		 <![CDATA[
+		to_date(end_date,'YYYY/MM/DD HH24:MI:SS') < to_date(sysdate,'YYYY/MM/DD HH24:MI:SS')
+		]]>
+	</select>
+
+	<update id="deleteEndClassFromTimeDetail">
+		delete from time_detail
+	 	 where
+			class_code = #{classCode}
+	</update>
+
+	<select id="selectClassNameListById" parameterType="str" resultType="class">
+		select
+		    class_code,
+		    class_name
+		from
+		    class
+		where class_code in(select
+		                        class_code
+		                    from
+		                        class_ing
+		                    where id=#{id})
+	</select>
+
+	<select id="selectApplicationClassList" resultType="class">
+		select
+		    class_code
+		   ,class_rank
+		   ,class_name
+		   ,id
+		   ,subdetail_code
+		   ,cpno
+		   ,start_date
+		   ,end_date
+		   ,stu_cnt
+		   ,class_price
+		   ,total_time
+		   ,class_grade
+		   ,cpcheck
+		   ,regdate
+		from
+		    class
+		where end_date >= sysdate
+			and cpcheck = '3'
+		    and class_code not in (select
+		                                class_code
+		                            from
+		                                class_ing
+		                            where id = #{id})
+		    <include refid="searchAppList"/>
+	</select>
+	<select id="selectApplicationClassListCount" resultType="int">
+		select
+		    count(*)
+		from
+		    class
+		where end_date >= sysdate
+			and cpcheck = '3'
+		    and class_code not in (select
+		                                class_code
+		                            from
+		                                class_ing
+		                            where id = #{id})
+		    <include refid="searchAppList"/>
+	</select>
+
+	<select id="selectSubjectBySubdetail" parameterType="int" resultType="kr.or.ddit.dto.SubjectVO">
+		select *
+		  from subject
+		 where subject_code in (select
+		 						    subject_code
+								from
+								    subdetail
+								where subdetail_code = #{code})
+	</select>
+
+	<select id="selectOverStuCnt" parameterType="int" resultType="str">
+		select
+		    stu_cnt
+		from
+		    class
+		where class_code = #{code}
+		 and stu_cnt = (select
+		                    count(*)
+		                from
+		                    class_ing
+		                where class_code = #{code})
+	</select>
+	<update id="registClassing" parameterType="kr.or.ddit.dto.ClassingVO">
+		insert into class_ing (
+		    class_code
+		   ,id
+		   ,class_regdate
+		) values (
+		    #{classCode}
+		   ,#{id}
+		   ,sysdate
+		)
+
+	</update>
+	<select id="selectRecomendClass" resultType="class">
+	select
+	    a.class_code
+	   ,a.class_rank
+	   ,a.class_name
+	   ,a.id
+	   ,a.subdetail_code
+	   ,a.cpno
+	   ,a.start_date
+	   ,a.end_date
+	   ,a.stu_cnt
+	   ,a.class_price
+	   ,a.total_time
+	   ,a.class_grade
+	   ,a.cpcheck
+	   ,a.regdate
+	   ,c.name
+	from
+	    class a, subdetail b, member c
+	where a.subdetail_code = b.subdetail_code
+	  and a.id = c.id
+	  and b.subject_code = #{subjectCode}
+	  and a.class_grade = #{grade}
+	  and a.class_rank = #{rank}
+	  and rownum = 1
+	</select>
+	<select id="getClassingByclassingVO" parameterType="kr.or.ddit.dto.ClassingVO" resultType="kr.or.ddit.dto.ClassingVO">
+		select
+		    class_code
+		   ,id
+		   ,class_regdate
+		from
+		    class_ing
+		where class_code = #{classCode}
+		  and id = #{id}
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

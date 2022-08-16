@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Member-Mapper">
+	<sql id="search">
+		<if test="searchType == 'i'.toString()">
+			and id like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'p'.toString()">
+			and phone like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'e'.toString()">
+			and email like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'n'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+
+
+	<select id="selectMemberList" resultType="member">
+		select
+		*
+		from
+		member
+		order by regDate desc
+	</select>
+
+	<select id="selectMemberListByAuthority" parameterType="str" resultType="member">
+		select
+		*
+		from
+		member
+		where authority = #{authority}
+		order by regDate desc
+	</select>
+
+	<select id="selectMemberListCount" resultType="int">
+		select
+		count(*)
+		from
+		member
+		order by regDate desc
+	</select>
+	<select id="selectSearchMemberList" resultType="member">
+		select
+		*
+		from member
+		where id is not null
+		<include refid="search" />
+		order by regDate desc
+	</select>
+	<select id="selectSearchMemberListCount" resultType="int">
+		select
+		count(*)
+		from member
+		where id is not null
+		<include refid="search" />
+	</select>
+
+	<select id="selectMemberByPicture" parameterType="str" resultType="member">
+		select
+		*
+		from member
+		where picture=#{picture}
+	</select>
+
+	<select id="selectMemberById" parameterType="str" resultType="member">
+		select
+		*
+		from member
+		where id=#{id}
+	</select>
+	<update id="insertMember" parameterType="member">
+		insert into
+		member(id, pwd, email, phone,picture,name,authority)
+		values(#{id},#{pwd},#{email},#{phone},#{picture},#{name},#{authority})
+	</update>
+	<update id="updateMember" parameterType="member">
+		update member
+		    set
+		        pwd = #{pwd}
+		        ,phone = #{phone}
+		        ,parent_phone = #{parentPhone}
+		        ,email = #{email}
+		        ,address = #{address}
+		        ,detail_address =#{detailAddress}
+		        ,fu_uni = #{fuUni}
+		        ,su_uni = #{suUni}
+		        ,tu_uni = #{tuUni}
+		        ,picture = #{picture}
+		where
+		    id = #{id}
+	</update>
+
+<!-- 	<update id="updateMember" parameterType="member"> -->
+<!-- 		update member -->
+<!-- 		set -->
+<!-- 		pwd=#{pwd},email=#{email},phone=#{phone},name=#{name}, -->
+<!-- 		picture=#{picture} -->
+
+<!-- 		<if test="authority != null"> -->
+<!-- 			,authority=#{authority} -->
+<!-- 		</if> -->
+
+<!-- 		where id=#{id} -->
+<!-- 	</update> -->
+
+	<update id="deleteMember" parameterType="str" >
+		delete
+		from member
+		where id=#{id}
+	</update>
+	<update id="enabledMember">
+		update member
+		set enabled=#{enabled}
+		where id=#{id}
+	</update>
+
+	<select id="selectMemberTodayClass" parameterType="str" resultType="map">
+		select
+		    a.class_code as CLASSCODE,
+		    a.class_name as CLASSNAME,
+		    min(b.start_time) as STARTTIME
+		from class a,
+		(select
+		    TIME_CODE
+		    ,ROOM_CODE
+		    ,START_TIME
+		    ,END_TIME
+		    ,CLASS_CODE
+		    ,CLASSDAY
+		    ,CTPERIOD
+		    from time_detail
+		    where class_code in (select
+		                                class_code
+		                            from
+		                                class
+		                            where class_code in(select
+		                                                    class_code
+		                                                from
+		                                                    class_ing
+		                                                where id=#{id})
+		                            and end_date >= sysdate)
+		        and CLASSDAY = to_char(sysdate, 'd')-1
+		        ORDER BY START_TIME) b
+		where a.class_code = b.class_code
+		group by  a.class_code, a.class_name
+	</select>
+
+	<select id="selectTimeTable" parameterType="str" resultType="kr.or.ddit.command.TimeTableCommand">
+		select
+		    a.class_code
+		   ,a.class_name
+		   ,a.subdetail_code
+		   ,b.classday
+		   ,b.start_time
+		   ,b.end_time
+
+		from
+		    class a, time_detail b
+		where a.class_code in(select
+		                            class_code
+		                        from
+		                            class_ing
+		                        where id=#{id})
+		<![CDATA[		                        
+		and a.end_date > sysdate
+		]]>
+		and a.class_code = b.class_code
+		order by class_code
+
+	</select>
+	
+	<select id="selectTimeTableForTeacher" parameterType="str" resultType="kr.or.ddit.command.TimeTableCommand">
+		select
+		    a.class_code
+		   ,a.class_name
+		   ,a.subdetail_code
+		   ,a.cpcheck
+		   ,b.classday
+		   ,b.start_time
+		   ,b.end_time
+
+		from
+		    class a, time_detail b
+		where a.class_code in(select
+		                            class_code
+		                        from
+		                            class
+		                        where id=#{id})
+		<![CDATA[                      
+		and a.end_date > sysdate
+		]]>
+		and a.cpcheck = '3'
+		and a.class_code = b.class_code
+		order by class_code
+
+	</select>
+
+
+
+
+
+
+	<!-- 희망대학 -->
+	<select id="selectUniCodeByUniName" parameterType="str" resultType="str">
+	 select
+		    univ_code
+		from
+		    university
+		where university_name = #{name}
+	</select>
+	<select id="selectSHUniv" parameterType="str" resultType="kr.or.ddit.dto.SHUnivVO">
+		select
+		    sh_code
+		   ,id
+		   ,univ_code1
+		   ,univ_code2
+		   ,univ_code3
+		from
+		    sh_univ
+		    where id = #{id}
+	</select>
+
+	<select id="selectSHUnivNextSeq">
+		select shuni_seq.nextval from dual
+	</select>
+
+	<update id="insertSHUniv" parameterType="kr.or.ddit.dto.SHUnivVO">
+		insert into sh_univ (
+		    sh_code
+		   ,id
+		   ,univ_code1
+		   ,univ_code2
+		   ,univ_code3
+		) values (
+		    #{shCode}
+		   ,#{id}
+		   ,#{univCode1}
+		   ,#{univCode2}
+		   ,#{univCode3}
+		)
+
+	</update>
+	<update id="updateSHUniv" parameterType="kr.or.ddit.dto.SHUnivVO">
+		update sh_univ
+		    set
+		        univ_code1 = #{univCode1}
+		       ,univ_code2 = #{univCode2}
+		       ,univ_code3 = #{univCode3}
+		where
+		    sh_code = #{shCode}
+
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

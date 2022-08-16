@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Pds-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 'tcw'.toString()">
+			and title like '%'||#{keyword}||'%'
+        	or writer like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and writer like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+
+
+	<select id="selectSearchPdsList" resultType="pds">
+		select
+		*
+		from pds
+		where lcode is not null
+		<include refid="search" />
+		order by regDate desc
+	</select>
+	<select id="selectSearchPdsListCount" resultType="int">
+		select
+		count(*)
+		from pds
+		where lcode is not null
+		<include refid="search" />
+	</select>
+
+
+
+
+	<select id="selectAllPdsList" resultType="pds">
+		select
+		    lcode
+		   ,title
+		   ,content
+		   ,viewcnt
+		   ,regdate
+		   ,updatedate
+		   ,writer
+		from
+		    pds
+		order by regdate desc
+	</select>
+
+	<select id="selectPdsByLCode" resultType="pds">
+		select *
+		from pds
+		where lcode=#{lCode}
+	</select>
+
+	<update id="increaseViewCnt" parameterType="int">
+		update
+		pds
+		set
+		viewcnt=viewcnt+1
+		where lcode=#{lCode}
+	</update>
+
+	<update id="deletePds" parameterType="int">
+		delete
+		from pds
+		where lCode=#{lCode}
+	</update>
+
+
+	<update id="insertPds" parameterType="pds">
+		insert into pds (
+		    lcode
+		   ,title
+		   ,content
+		   ,viewcnt
+		   ,regdate
+		   ,updatedate
+		   ,writer
+		) values (
+		    #{lCode}
+		   ,#{title}
+		   ,#{content}
+		   ,0
+		   ,sysdate
+		   ,sysdate
+		   ,#{writer}
+		)
+	</update>
+	<update id="updatePds" parameterType="pds">
+		update pds
+		set
+			title = #{title}
+			, content = #{content}
+			, updatedate = sysdate
+		where
+			lcode = #{lCode}
+	</update>
+</mapper>

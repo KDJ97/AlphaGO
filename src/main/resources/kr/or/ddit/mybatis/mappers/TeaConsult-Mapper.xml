@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TeaConsult-Mapper">
+	<sql id="search">
+		<if test="searchType == 'tcw'.toString()">
+			and name like '%'||#{keyword}||'%'
+
+			or purpose like
+			'%'||#{keyword}||'%'
+
+		</if>
+		<if test="searchType == 't'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and purpose like '%'||#{keyword}||'%'
+		</if>
+
+	</sql>
+
+	<select id="selectCounseltList" resultType="tecounselt">
+
+
+
+			SELECT
+   				 coun_code
+   				,regdate
+  				 ,meetdate
+  				 ,content
+  				 ,result
+  				 ,purpose
+ 				  ,status
+   				,counselor
+  				 ,client
+   				,con_start
+  				 ,con_end
+  			 ,title
+			FROM
+   				 counselt
+    		where
+				status='0'
+				order by meetdate
+					desc
+		
+	</select>
+
+	<select id="selectCounseltListCount" resultType="int">
+		select
+		count(*)
+		from
+		counselt
+		where status='0'
+		order by meetdate desc
+	</select>
+
+	<select id="selectSearchCounseltList" resultType="tecounselt">
+		select
+		*
+		from counselt
+		where coun_code is not null
+		and status='0'
+		<include refid="search" />
+		order by meetdate desc
+	</select>
+
+	<select id="selectSearchCounseltListCount" resultType="int">
+		select
+		count(*)
+		from counselt
+		where coun_code is not null
+		and status='0'
+		<include refid="search" />
+	</select>
+	
+	<select id="selectName" resultType="str">
+		select b.name
+		from
+		counselt
+		a,
+		member b
+		where a.client=b.id
+		and
+		a.coun_code=#{counCode}
+	</select>
+</mapper>

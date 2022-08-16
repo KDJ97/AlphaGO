@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Mypage-Mapper">
+
+	<select id="selectInfoForMypage" resultType="member">
+		select *
+		  from member 
+		 where id=#{id}
+	</select>
+	
+	<select id="selectTeacherCareerList" resultType="career">
+		select * 
+		  from career 
+		 where id=#{id}
+		 order by end_date
+	</select>
+
+	<update id="modifyTeacherInfo" parameterType="member" >
+		update member
+		set 
+			pwd=#{pwd},
+			address=#{address},
+			detail_address=#{detailAddress},
+			email=#{email},
+			picture=#{picture},
+			phone=#{phone}
+		where id=#{id}	
+	</update>
+	
+	<update id="modifyCareer" parameterType="career">
+		update career
+		set 
+			cacontent=#{cacontent},
+			start_date=#{startDate},
+			end_date=#{endDate}
+		where career_code=#{careerCode}
+	</update>
+	
+</mapper>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Conselt-Mapper">
+  <select id="selectNextSeq" resultType="int">
+  	select con_seq.nextval from dual
+  </select>
+
+  <update id="registConselt" parameterType="kr.or.ddit.dto.CounseltVO">
+    insert into counselt (
+	    coun_code
+	   ,regdate
+	   ,meetdate
+	   ,content
+	   ,purpose
+	   ,status
+	   ,counselor
+	   ,client
+	   ,con_start
+	   ,con_end
+	   ,title
+	) values (
+	    #{counCode}
+	   ,sysdate
+	   ,#{meetdate}
+	   ,#{content}
+	   ,#{purpose}
+	   ,#{status}
+	   ,#{counselor}
+	   ,#{client}
+	   ,#{conStart}
+	   ,#{conEnd}
+	   ,#{title}
+	)
+
+  </update>
+
+  <select id="selectApplyingCounselt" parameterType="str" resultType="kr.or.ddit.dto.CounseltVO">
+	  SELECT
+	    coun_code
+	   ,regdate
+	   ,meetdate
+	   ,content
+	   ,result
+	   ,purpose
+	   ,status
+	   ,counselor
+	   ,client
+	   ,con_start
+	   ,con_end
+	   ,title
+	from
+	    counselt
+	where status = 0
+	and client = #{id}
+  </select>
+
+  <select id="selectAppliedCounselt" parameterType="str" resultType="kr.or.ddit.dto.CounseltVO">
+	  SELECT
+	    coun_code
+	   ,regdate
+	   ,meetdate
+	   ,content
+	   ,result
+	   ,purpose
+	   ,status
+	   ,counselor
+	   ,client
+	   ,con_start
+	   ,con_end
+	   ,title
+	from
+	    counselt
+	where status != 0
+	and client = #{id}
+  </select>
+
+  <select id="selectApplyingPacounselt" parameterType="str" resultType="kr.or.ddit.dto.PacounseltVO">
+	  select
+	    pc_code
+	   ,counselor
+	   ,client
+	   ,regdate
+	   ,meetdate
+	   ,content
+	   ,result
+	   ,purpose
+	   ,status
+	   ,fu_code
+	   ,su_code
+	   ,tu_code
+	   ,pc_start
+	   ,pc_end
+	   ,title
+	from
+	    pacounselt
+	where status = 0
+	and client = #{id}
+
+  </select>
+
+  <select id="selectAppliedPacounselt" parameterType="str" resultType="kr.or.ddit.dto.PacounseltVO">
+	  select
+	    pc_code
+	   ,counselor
+	   ,client
+	   ,regdate
+	   ,meetdate
+	   ,content
+	   ,result
+	   ,purpose
+	   ,status
+	   ,fu_code
+	   ,su_code
+	   ,tu_code
+	   ,pc_start
+	   ,pc_end
+	   ,title
+	from
+	    pacounselt
+	where status != 0
+	and client = #{id}
+
+  </select>
+
+  <update id="deletePacounselt" parameterType="int">
+	  delete from pacounselt
+		where
+		    pc_code = #{code}
+  </update>
+
+  <update id="deleteCounselt" parameterType="int">
+	  delete from counselt
+		where
+		    coun_code = #{code}
+  </update>
+
+  <select id="selectPacounselt" parameterType="int" resultType="kr.or.ddit.dto.PacounseltVO">
+	  select
+	    pc_code
+	   ,counselor
+	   ,client
+	   ,regdate
+	   ,meetdate
+	   ,content
+	   ,result
+	   ,purpose
+	   ,status
+	   ,fu_code
+	   ,su_code
+	   ,tu_code
+	   ,pc_start
+	   ,pc_end
+	   ,title
+	from
+	    pacounselt
+	where pc_code = #{code}
+  </select>
+
+  <select id="selectCounselt" parameterType="int" resultType="kr.or.ddit.dto.CounseltVO">
+	  select
+		    coun_code
+		   ,regdate
+		   ,meetdate
+		   ,content
+		   ,result
+		   ,purpose
+		   ,status
+		   ,counselor
+		   ,client
+		   ,con_start
+		   ,con_end
+		   ,title
+		from
+		    counselt
+		where coun_code = #{code}
+
+  </select>
+  
+  
+  
+  
+  
+  
+</mapper>
+

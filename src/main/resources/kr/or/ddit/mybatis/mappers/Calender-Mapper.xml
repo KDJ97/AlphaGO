@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="Calender-Mapper">
+	  <select id="getAllCalender" resultType="calendar">
+		select pc_code,
+			   pc_start,
+			   pc_end,
+			   title,
+			   counselor
+		  from pacounselt
+		  where status='1'
+		    and counselor=#{id}
+<!--  select pc_code, -->
+<!-- 		pc_start, -->
+<!-- 		pc_end, -->
+<!-- 		title, -->
+<!-- 		counselor -->
+
+<!-- 		  from pacounselt  -->
+
+<!--          where  counselor=#{counselor} -->
+
+	  </select>
+
+<!--   	  <update id = "insertCalender"> -->
+<!--   	  	insert into	pacounselt (schedule_no, start_date, end_date, title, allday) -->
+<!--   	  	values(schedule_seq.nextval, #{start}, #{end}, #{title}, #{allDay}) -->
+<!--   	  </update> -->
+
+<!--  <update id = "insertCalender" parameterType="pacounselt">  -->
+
+<!--   	  	update -->
+<!-- 		pacounselt -->
+<!-- 		set  -->
+<!-- 		pc_start=#{pcStart}, -->
+<!-- 		pc_end=#{pcEnd}, -->
+<!-- 		title=#{title} -->
+<!-- 		status='1' -->
+<!-- 		where -->
+<!-- 		pc_code =#{pcCode} -->
+<!--  	</update> -->
+
+  	  <delete id="deleteCalender">
+  	  	delete from schedule
+  	  </delete>
+
+  	<select id="selectAllCalendarByIdToMaster" parameterType="str" resultType="calendar">
+  		select pc_code,
+			   pc_start,
+			   pc_end,
+			   title,
+			   counselor
+		  from pacounselt
+		  where client=#{id}
+  	</select>
+
+  	<select id="selectAllCalendarByIdToTeacher" parameterType="str" resultType="calendar">
+	  	select
+		    coun_code as pc_code
+		   ,counselor
+		   ,con_start as pc_start
+		   ,con_end as pc_end
+		   ,title
+		from
+		    counselt
+		    where client = #{id}
+  	</select>
+
+  	<select id="selectReservationListToM" parameterType="map" resultType="str">
+	  	select
+		    to_char(pc_start, 'HH24:MI')
+		from
+		    pacounselt
+		where counselor = #{counselor}
+		and to_char(meetdate, 'yyyy-MM-DD') = #{date}
+  	</select>
+
+  	<select id="selectReservationListToT" parameterType="map" resultType="str">
+	  	select
+		    to_char(con_start, 'HH24:MI')
+		from
+		    counselt
+		where counselor = #{counselor}
+		and to_char(meetdate, 'yyyy-MM-DD') = #{date}
+  	</select>
+  </mapper>

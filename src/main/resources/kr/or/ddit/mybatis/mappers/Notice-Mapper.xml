@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Notice-Mapper">
+
+	<sql id="category">
+		<if test="cateType == '전체'.toString()">
+			and (
+			category = '수업'
+			or
+			category = '학원'
+			or
+			category = '입시'
+			or
+			category = '기타'
+			)
+		</if>
+		<if test="cateType == '수업'.toString()">
+			and category = '수업'
+		</if>
+		<if test="cateType == '학원'.toString()">
+			and category = '학원'
+		</if>
+		<if test="cateType == '입시'.toString()">
+			and category = '입시'
+		</if>
+		<if test="cateType == '기타'.toString()">
+			and category = '기타'
+		</if>
+	</sql>
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and writer like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and content like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+<!-- 	<sql id="category">
+		<if test="name == '전체'.toString()">
+			and category like '%'||#{name}||'%'
+		</if>
+		<if test="name == '수업'.toString()">
+			and writer like '%'||#{name}||'%'
+		</if>
+		<if test="name == '학원'.toString()">
+			and content like '%'||#{name}||'%'
+		</if>
+		<if test="name == '입시'.toString()">
+			and content like '%'||#{name}||'%'
+		</if>
+		<if test="name == '기타'.toString()">
+			and content like '%'||#{name}||'%'
+		</if>
+	</sql> -->
+	<select id="selectSearchNoticeList" resultType="notice">
+		select
+		*
+		from notice
+		where lcode is not null   <!-- 기본키 is not null 로 작성 -->
+		<include refid="search" />
+		<include refid="category" />
+		order by regDate desc
+	</select>
+
+	<select id="selectFixedList" resultType="notice">
+		select * from notice
+		where lcode is not null
+		and fixed = 1
+	</select>
+	
+	<select id="selectSearchNoticeListCount" resultType="int">
+		select
+		count(*)
+		from notice
+		where lcode is not null
+		<include refid="search" />
+		<include refid="category" />
+		order by regDate desc
+	</select>
+
+	<select id="selectAllNoticeList" resultType="notice">
+		select
+		*
+		from
+		notice
+		order by regdate desc
+	</select>
+
+	<select id="selectNoticeByImage" resultType="notice">
+		select
+		*
+		from notice
+		where content like '%'||#{imageFile}||'%'
+	</select>
+
+	<select id="selectNoticeBylcode" parameterType="int"
+		resultType="notice">
+		select
+		*
+		from notice
+		where lcode=#{lcode}
+	</select>
+
+	<select id="selectNoticeSequenceNextValue" resultType="int">
+		select
+		notice_seq.nextVal
+		from dual
+	</select>
+
+	<update id="increaseViewCount" parameterType="int">
+		update notice
+		set
+		viewcnt=viewcnt+1
+		where lcode=#{lcode}
+	</update>
+
+	<update id="insertNotice" parameterType="notice">
+		insert into
+		notice(lcode,title,writer,content,category,fixed)
+		values(#{lcode},#{title},#{writer},#{content},#{category},#{fixed})
+	</update>
+
+	<update id="updateNotice" parameterType="notice">
+		update notice
+		set
+		title=#{title},content=#{content},category=#{category},fixed=#{fixed}
+		where lcode=#{lcode}
+	</update>
+
+	<update id="deleteNotice" parameterType="int">
+		delete
+		from notice
+		where
+		lcode=#{lcode}
+	</update>
+</mapper>

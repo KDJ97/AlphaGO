@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+
+<configuration>
+
+	<settings>
+		<!-- 자동으로 카멜케이스 규칙으로 변환 -->
+    	<setting name="mapUnderscoreToCamelCase" value="true"/>
+    	<!--  파라미터에 null값이 있을 경우 에러 처리  -->
+    	<setting name="jdbcTypeForNull" value="VARCHAR" />
+	</settings>
+
+   <typeAliases>
+      <typeAlias type="java.lang.String" alias="str" />
+      <typeAlias type="java.lang.Integer" alias="int" />
+      <typeAlias type="java.util.Map" alias="map" />
+
+      <typeAlias type="kr.or.ddit.dto.MemberVO"  alias="member"/>
+      <typeAlias type="kr.or.ddit.dto.NoticeVO" alias="notice"/>
+      <typeAlias type="kr.or.ddit.dto.SuggestVO" alias="suggest"/>
+      <typeAlias type="kr.or.ddit.dto.ClassroomVO" alias="room"/>
+      <typeAlias type="kr.or.ddit.dto.FixtureVO" alias="fixture"/>
+      <typeAlias type="kr.or.ddit.dto.UseFixtVO" alias="useFixt"/>
+      <typeAlias type="kr.or.ddit.dto.SuggestAnswerVO" alias="suggestAnswer"/>
+	  <typeAlias type="kr.or.ddit.dto.FavoritesVO" alias="fav"/>
+      <typeAlias type="kr.or.ddit.dto.MenuVO" alias="menu"/>
+      <typeAlias type="kr.or.ddit.dto.DmVO" alias="dm"/>
+      <typeAlias type="kr.or.ddit.dto.CalendarVO" alias="calendar"/>
+	  <typeAlias type="kr.or.ddit.dto.LboardVO" alias="lboard"/>
+	  <typeAlias type="kr.or.ddit.dto.TeachermasVO" alias="teachermas"/>
+      <typeAlias type="kr.or.ddit.dto.DmVO" alias="dm"/>
+      <typeAlias type="kr.or.ddit.dto.CalendarVO" alias="calendar"/>
+      <typeAlias type="kr.or.ddit.dto.AssignVO" alias="assign"/>
+      <typeAlias type="kr.or.ddit.dto.StudentVO"  alias="student"/>
+      <typeAlias type="kr.or.ddit.dto.PdsVO" alias="pds"/>
+      <typeAlias type="kr.or.ddit.dto.AttachVO" alias="attach"/>
+      <typeAlias type="kr.or.ddit.dto.LboardVO" alias="lboard"/>
+      <typeAlias type="kr.or.ddit.dto.FavoritesVO" alias="fav"/>
+	  <typeAlias type="kr.or.ddit.dto.FixtureVO"  alias="fixture"/>
+	  <typeAlias type="kr.or.ddit.dto.UseFixtVO" alias="useFixt"/>
+	  <typeAlias type="kr.or.ddit.dto.TeachermasVO" alias="teachermas"/>
+	  <typeAlias type="kr.or.ddit.dto.ApplyVO" alias="apply"/>
+	  <typeAlias type="kr.or.ddit.dto.ClassingVO" alias="classing"/>
+	  <typeAlias type="kr.or.ddit.dto.ClassVO" alias="class"/>
+	  <typeAlias type="kr.or.ddit.dto.SubjectVO" alias="subject"/>
+	  <typeAlias type="kr.or.ddit.dto.PacounseltVO" alias="pacounselt"/>
+	  <typeAlias type="kr.or.ddit.dto.AssignNameVO" alias="assignName"/>
+	  <typeAlias type="kr.or.ddit.dto.CertificateVO" alias="certificate"/>
+	  <typeAlias type="kr.or.ddit.dto.SchoolScoreVO" alias="schoolscore"/>
+	  <typeAlias type="kr.or.ddit.dto.AssignAttachVO" alias="assignAttach"/>
+	  <typeAlias type="kr.or.ddit.dto.UseRoomVO" alias="useroom"/>
+	  <typeAlias type="kr.or.ddit.dto.TimeDetailVO" alias="timeDetail"/>
+	  <typeAlias type="kr.or.ddit.dto.ClassProgVO" alias="classprog"/>
+	  <typeAlias type="kr.or.ddit.dto.ClassTimeVO" alias="classTime"/>
+	  <typeAlias type="kr.or.ddit.dto.ClassPlanVO" alias="classPlan"/>
+	  <typeAlias type="kr.or.ddit.dto.WeekPlanVO" alias="weekPlan"/>
+	  <typeAlias type="kr.or.ddit.dto.HomeworkPlanVO" alias="homeworkPlan"/>
+	  <typeAlias type="kr.or.ddit.dto.ProblemVO" alias="problem"/>
+	  <typeAlias type="kr.or.ddit.dto.SchoolVO" alias="school"/>
+	  <typeAlias type="kr.or.ddit.dto.PopupVO" alias="popup"/>
+	  <typeAlias type="kr.or.ddit.dto.PopAttachVO" alias="popAttach"/>
+	  <typeAlias type="kr.or.ddit.dto.ExamVO" alias="exam"/>
+	  <typeAlias type="kr.or.ddit.dto.StudyPlanVO" alias="studyPlan"/>
+	  <typeAlias type="kr.or.ddit.dto.StudyPlanerVO" alias="studyPlaner"/>
+	  <typeAlias type="kr.or.ddit.dto.AttendanceVO" alias="attend"/>
+	  <typeAlias type="kr.or.ddit.dto.AcademyScoreVO" alias="academyScore"/>
+	  <typeAlias type="kr.or.ddit.dto.ClassReviewVO" alias="classreview"/>
+	  <typeAlias type="kr.or.ddit.dto.CareerVO" alias="career"/>
+	  <typeAlias type="kr.or.ddit.dto.WrongVO" alias="wrong"/>
+	  <typeAlias type="kr.or.ddit.dto.MemberCountVO" alias="memberCountVO"/>
+	  <typeAlias type="kr.or.ddit.dto.SubdetailClassingVO" alias="subdetailClassingVO"/>
+	  <typeAlias type="kr.or.ddit.dto.ResumeVO" alias="resume"/>
+	  <typeAlias type="kr.or.ddit.dto.TecounseltVO" alias="tecounselt"/>
+   </typeAliases>
+
+</configuration>

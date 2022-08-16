@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Lboard-Mapper">
+
+	<select id="selectLboardSeqNext" resultType="int">
+		select lboard_seq.nextval as lcode from dual
+	</select>
+
+	<update id="insertLboard" parameterType="lboard" >
+		insert into lboard(lcode,bcode)
+		values (#{lcode},#{bcode})
+	</update>
+
+</mapper>

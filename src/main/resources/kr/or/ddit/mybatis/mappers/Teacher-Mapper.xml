@@ -1,0 +1,1342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Teacher-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 'n'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 's'.toString()">
+			and school_code like '%'||#{keyword}||'%'
+		</if>
+
+		<if test="searchType == 'ns'.toString()">
+			and (
+			name like '%'||#{keyword}||'%'
+			or
+			school_code like
+			'%'||#{keyword}||'%'
+			)
+		</if>
+
+	</sql>
+
+
+
+	<sql id="search2">
+		<if test="searchType == 'n'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 's'.toString()">
+			and school_code like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'g'.toString()">
+			and grade like '%'||#{keyword}||'%'
+		</if>
+
+		<if test="searchType == 'nsg'.toString()">
+			and (
+			name like '%'||#{keyword}||'%'
+			or
+			school_code like
+			'%'||#{keyword}||'%'
+			or
+			grade like '%'||#{keyword}||'%'
+			)
+		</if>
+
+	</sql>
+	
+	<sql id="search3">
+		<if test="selectgo == 'a'.toString()">
+		
+		</if>
+		
+
+		<if test="selectgo == 'm'.toString()">
+			and 
+			a.maker like '%'||#{id}||'%'
+		
+			
+			
+		</if>
+
+	</sql>
+
+
+
+
+
+
+
+
+	<select id="processSearch" parameterType="string"
+		resultType="string">
+		select class_name from class
+		where id=#{id}
+
+	</select>
+
+	<select id="processStudentlistCount" resultType="int">
+		select
+		count(distinct id)
+		from (select a.* from member a,class_ing b
+		where
+		a.id=b.id and
+		b.class_code=#{classCode})
+		where id is not null
+		<include refid="search" />
+		order by regDate desc
+
+	</select>
+	
+	
+		<select id="processStudentlistCount2" resultType="int">
+		select
+		count(distinct id)
+		from (select a.* from member a,class_ing b
+		where
+		a.id=b.id)
+		where id is not null
+		<include refid="search" />
+		order by regDate desc
+
+	</select>
+	
+	
+	
+	
+	<select id="examAllList" resultType="int">
+	   select count(d.ACADEMY_SCORE)
+         from exam a,class b,member c,academy_score d,class_ing e
+         where a.class_code=e.class_code
+         and e.id=c.id
+         and d.exam_code=a.exam_code
+         and e.class_code=b.class_code
+         and c.authority='ROLE_STUDENT'
+         and b.id=#{id}
+		
+	</select>
+	
+		<select id="examAllList2" resultType="int">
+	   select count(d.ACADEMY_SCORE)
+         from exam a,class b,member c,academy_score d,class_ing e
+         where a.class_code=e.class_code
+         and e.id=c.id
+         and d.exam_code=a.exam_code
+         and e.class_code=b.class_code
+         and c.authority='ROLE_STUDENT'
+         and b.id=#{id}
+         and b.class_code=#{searchType}
+         and a.exam_code=#{keyword}
+	</select>
+	
+	<select id="examAllListgo" resultType="exam">
+
+		select *
+		from(
+		select rownum as rnum,SearchProcessStudentResult.*
+		from (
+		  select  distinct b.class_name,a.exam_name,a.exam_code,c.name,d.academy_score as acardemyScore,a.end_date,b.id
+         from exam a,class b,member c,academy_score d,class_ing e
+         where a.class_code=e.class_code
+         and e.id=c.id
+         and d.exam_code=a.exam_code
+         and e.class_code=b.class_code
+         and c.authority='ROLE_STUDENT'
+          and b.id=#{id}
+<!-- 		<include refid="examsearch" /> -->
+		order by a.end_date desc
+		) SearchProcessStudentResult
+		    <![CDATA[
+		    where rownum <= #{endRow}
+		    ]]>
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]>
+		 order by end_date desc
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="examAllListgo2" resultType="exam">
+
+		select *
+		from(
+		select rownum as rnum,SearchProcessStudentResult.*
+		from (
+		  select distinct b.class_name,a.exam_name,a.exam_code,c.name,d.academy_score as acardemyScore,a.end_date
+         from exam a,class b,member c,academy_score d,class_ing e
+         where a.class_code=e.class_code
+         and e.id=c.id
+         and d.exam_code=a.exam_code
+         and e.class_code=b.class_code
+         and c.authority='ROLE_STUDENT'
+          and b.id=#{id}
+          and b.class_code=#{searchType}
+         and a.exam_code=#{keyword}
+		order by a.end_date desc
+		) SearchProcessStudentResult
+		    <![CDATA[
+		    where rownum <= #{endRow}
+		    ]]>
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]>
+		 order by end_date desc
+	</select>
+	
+	
+	<select id="examAllListgo3" resultType="exam">
+
+		select *
+		from(
+		select rownum as rnum,SearchProcessStudentResult.*
+		from (
+		  select distinct b.class_name,a.exam_name,a.exam_code,c.name,d.academy_score as acardemyScore,a.end_date,b.id
+         from exam a,class b,member c,academy_score d,class_ing e
+         where a.class_code=e.class_code
+         and e.id=c.id
+         and d.exam_code=a.exam_code
+         and e.class_code=b.class_code
+         and c.authority='ROLE_STUDENT'
+          and b.id=#{id}
+<!-- 		<include refid="examsearch" /> -->
+		order by a.end_date desc
+		) SearchProcessStudentResult
+	
+		)
+		
+		 order by end_date desc
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="examAllListgo4" resultType="exam">
+
+		select *
+		from(
+		select rownum as rnum,SearchProcessStudentResult.*
+		from (
+		  select distinct b.class_name,a.exam_name,a.exam_code,c.name,d.academy_score as acardemyScore,a.end_date
+         from exam a,class b,member c,academy_score d,class_ing e
+         where a.class_code=e.class_code
+         and e.id=c.id
+         and d.exam_code=a.exam_code
+         and e.class_code=b.class_code
+         and c.authority='ROLE_STUDENT'
+          and b.id=#{id}
+          and b.class_code=#{searchType}
+         and a.exam_code=#{keyword}
+		order by a.end_date desc
+		) SearchProcessStudentResult
+		    <![CDATA[
+		    where rownum <= #{endRow}
+		    ]]>
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]>
+		 order by end_date desc
+	</select>
+	
+	
+	
+
+
+	<select id="classCode" parameterType="string" resultType="int">
+		select
+		class_code from class
+		where class_name=#{class_name}
+	</select>
+
+
+	<select id="class_ingStudentIdSearch">
+		select distinct b.*
+		from member a,(select id from
+		class_ing where class_code=#{class_code}) b
+	</select>
+
+	<select id="processStudentlist" resultType="member">
+
+		select *
+		from(
+		select rownum as rnum,SearchProcessStudentResult.*
+		from (
+		select distinct a.* from member a,class_ing b
+		where
+		a.id=b.id and
+		b.class_code=#{classCode}
+		<include refid="search" />
+		order by regDate desc
+		) SearchProcessStudentResult
+		    <![CDATA[
+		    where rownum <= #{endRow}
+		    ]]>
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]>
+	</select>
+
+
+
+	<select id="processStudentlist2" resultType="member">
+
+		select *
+		from(
+		select rownum as rnum,SearchProcessStudentResult.*
+		from (
+		select distinct a.* from member a,class_ing b
+		where
+		a.id=b.id
+		<include refid="search" />
+		order by regDate desc
+		) SearchProcessStudentResult
+		    <![CDATA[
+		    where rownum <= #{endRow}
+		    ]]>
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]>
+	</select>
+
+
+
+
+
+
+
+
+
+	<select id="teacherstudentDetail" resultType="member">
+		select *from member
+		where id=#{id}
+	</select>
+
+	<select id="searchClass" resultType="string">
+		select class_name from class
+		where id=#{id}
+	</select>
+
+
+
+	<select id="teacherstudenttotalList" resultType="member">
+
+		select distinct *
+		from(
+		select rownum as
+		rnum,SearchProcessStudentResult.*
+		from (
+		select distinct c.* from member
+		c,(select b.id from (select class_code from class
+		where id=#{id})
+		a,class_ing b) d
+		where c.id=d.id
+		<include refid="search2" />
+
+		) SearchProcessStudentResult
+		    <![CDATA[
+		    where rownum <= #{endRow}
+		    ]]>
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]>
+	</select>
+
+	<select id="teacherstudenttotalListcount" resultType="int">
+		select
+		count(distinct id)
+		from (select c.* from member c,(select b.id from (select
+		class_code from
+		class where id=#{id}) a,class_ing b) d
+		where c.id=d.id)
+		where id is not null
+		<include refid="search2" />
+	</select>
+
+	<!-- 아이디로 이름검색 -->
+	<select id="idSearchName" resultType="string">
+		select name from member
+		where id=#{id}
+
+	</select>
+
+	<!-- 아이디로 과목코드 검색 -->
+	<select id="idSearchSubjectCode" resultType="string">
+		select subject_code
+		from subject where subject_name=#{subject}
+	</select>
+
+	<!-- 과목코드로 세부과목조회 -->
+	<select id="subjectCodeSearchDetailName" resultType="map">
+		select
+		subdetail_name,subdetail_code from subdetail where
+		subject_code=#{subject_code}
+	</select>
+
+	<!-- 세부과목코드로 영역검색 -->
+	<select id="detailCodeSearchSarea" resultType="map">
+		select sano,saname
+		from subarea where subdetail_code=#{subdetail_code}
+	</select>
+
+
+	<!-- 아이디로 과목검색 -->
+	<select id="idSearchSubject" resultType="string">
+		select subject from
+		member where id=#{id}
+	</select>
+
+
+	<!--세부과목명으로 단원(구성)검색 -->
+	<select id="danSearch" resultType="classprog">
+		select * from class_prog where
+		subdetail_code=(select subdetail_code from
+		subdetail where
+		subdetail_name=#{name})
+	</select>
+	<!--세부과목명으로 단원(구성)검색 -->
+	<select id="danSearch2" resultType="classprog">
+		select * from class_prog where
+		subdetail_code=#{detailCode}
+		order by subject_seq asc
+	
+	</select>
+
+	<select id="schoolGrage" resultType="schoolscore">
+		SELECT
+		sscode
+		,id
+		,myscore
+		,mygrade
+		,standard_score
+		,school_grade
+		,school_term
+		,subject_code
+		,regdate
+		,achievement
+		,rank
+		,stucnt
+		,perfect_score
+		,test_name
+		FROM
+		school_score
+		where
+		id=#{id}
+	</select>
+
+	<insert id="insertProblem" parameterType='problem'>
+		insert into problem(
+		problem_code
+		,sano
+		,problem_content
+		,lproblem
+		,problem_answer
+		,problem_solution
+		,grade
+		,subject_proccess
+		,picture
+		,none
+		,ntwo
+		,ntree
+		,nfour
+		,nfive
+		,plevel
+		,maker)
+		values(#{problemCode},
+		#{sano},
+		#{problemContent},
+		#{lproblem},
+		#{problemAnswer},
+		#{problemSolution},
+		#{grade},
+		#{subjectProccess},
+		#{picture},
+		#{none},
+		#{ntwo},
+		#{ntree},
+		#{nfour},
+		#{nfive},
+		#{plevel},
+		#{maker})
+	</insert>
+
+	<insert id="insertjimoonProblem">
+
+		INSERT INTO prob_content (
+		problem_printcode
+		,problem_code
+		,problem_print
+		) VALUES (
+		#{jimoonNum},#{proC1},#{problemPrint})
+	</insert>
+<insert id="insertjimoonProblem2">
+
+		INSERT INTO prob_content (
+		problem_printcode
+		,problem_code
+		
+		) VALUES (
+		#{jimoonNum},#{proC1})
+	</insert>
+
+
+	<select id="selectProblemSeqNext" resultType="int">
+		select
+		problem_seq.nextval as problem_code from dual
+	</select>
+
+
+
+	<select id="jimoonSequeceNext" resultType="int">
+		select
+		jimoon_seq.nextval as problem_printcode from dual
+	</select>
+
+	
+	<select id="problemPXList" resultType="problem">
+		select distinct *
+		from(
+		select rownum as
+		rnum,SearchResult.*
+		from (
+	      
+         select distinct  
+          a.problem_code
+   ,a.sano
+   ,a.problem_content
+   ,a.lproblem
+   ,a.problem_answer
+   ,a.problem_solution
+   ,a.grade
+   ,a.subject_proccess
+   ,a.school_code
+   ,a.picture
+   ,a.none
+   ,a.ntwo
+   ,a.ntree
+   ,a.nfour
+   ,a.nfive
+   ,a.plevel
+   ,a.maker
+   ,a.repot
+   ,a.repotcomment
+   ,b.subunit_name
+   ,c.saname
+    ,d.subdetail_name
+         from problem a,class_prog b,subarea c,subdetail d     
+         where a.subject_proccess=b.subject_proccess
+         and	   a.sano=c.sano
+          and    d.subdetail_code=b.subdetail_code
+        and a.sano in
+      (select sano from subarea 
+      where subdetail_code in
+        (select subdetail_code from subdetail
+        where subject_code in (select subject_code from subject where subject_name in #{subject})))
+        and (repot='0' or repot is null)
+        
+        
+		<include refid="search3" />
+            order by a.problem_code asc
+		) SearchResult
+		    <![CDATA[
+		    where rownum <= #{endRow}
+		    ]]>
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]>
+		order by problem_code asc
+	  
+	
+	</select>
+	
+<!-- 	지문x문제 숫자 -->
+		<select id="PXtotalcnt" resultType="int">
+		select
+		count(*)
+		 from problem a,class_prog b 
+         where a.subject_proccess=b.subject_proccess
+		
+		<include refid="search3" />
+		
+		</select>
+		
+<!-- 		문제가져오기 -->
+   	<select id="getProblem" resultType="problem">
+   	     select distinct  
+          a.problem_code
+   ,a.sano
+   ,a.problem_content
+   ,a.lproblem
+   ,a.problem_answer
+   ,a.problem_solution
+   ,a.grade
+   ,a.subject_proccess
+   ,a.school_code
+   ,a.picture
+   ,a.none
+   ,a.ntwo
+   ,a.ntree
+   ,a.nfour
+   ,a.nfive
+   ,a.plevel
+   ,a.maker
+   ,a.repot
+   ,a.repotcomment
+   ,b.subunit_name
+   ,c.saname
+    ,d.subdetail_name
+     ,e.problem_print
+         from problem a,class_prog b,subarea c,subdetail d,prob_content e       
+         where a.subject_proccess=b.subject_proccess
+         and	   a.sano=c.sano
+          and    d.subdetail_code=b.subdetail_code
+           and e.problem_code(+)=a.problem_code
+          and a.problem_code=#{prC}
+   	</select>
+		
+	<select id="getJimoon" resultType="string">
+	select a.problem_print from prob_content a,problem b
+  where a.problem_code=b.problem_code
+   and a.problem_printcode=(select problem_printcode from prob_content where problem_code=#{prC})
+  and NOT a.problem_print is NULL      
+
+	</select>		
+
+<!-- 	문제코드로 단원이름 검색 -->
+	<select id="danwonSearch" resultType="string">
+	  select a.subunit_name from class_prog a,problem b 
+      where b.problem_code=#{prC}
+	</select>
+	
+	
+	<select id="detailSubjecSearch" resultType="string">
+		 select subdetail_name from subdetail
+  where subdetail_code in (select subdetail_code from subarea
+  where sano=(select sano from problem where problem_code=#{prC}))
+	</select>
+		
+	
+	
+<!-- 	객관식 문제 수정 -->
+	<update id="modfyGProblem">
+		update problem set
+		 problem_content=#{problemContent},
+		 problem_answer=#{problemAnswer},
+		 problem_solution=#{problemSolution},
+		 none=#{none},
+		 ntwo=#{ntwo},
+		 ntree=#{ntree},
+		 nfour=#{nfour},
+		 nfive=#{nfive},
+		 repot='0',
+		 repotcomment=''
+	where problem_code=#{problemCode}
+	</update>
+	
+	<update id="modfyGProblem2">
+		update problem set
+		 problem_content=#{problemContent},
+		 problem_answer=#{problemAnswer},
+		 problem_solution=#{problemSolution},
+		 none=#{none},
+		 ntwo=#{ntwo},
+		 ntree=#{ntree},
+		 nfour=#{nfour},
+		 nfive=#{nfive},
+		 picture=#{picture},
+		  repot='0',
+		 repotcomment='' 
+	where problem_code=#{problemCode}
+	</update>
+	
+	<!-- 	주관식 문제 수정 -->
+	<update id="modfyJProblem">
+		update problem set
+		 problem_content=#{problemContent},
+		 problem_answer=#{problemAnswer},
+		 problem_solution=#{problemSolution},
+		  picture=#{picture},
+		   repot='0',
+		 repotcomment='' 
+	where problem_code=#{problemCode}
+	</update>
+	<!-- 	주관식 문제 수정2 -->
+	<update id="modfyJProblem2">
+		update problem set
+		 problem_content=#{problemContent},
+		 problem_answer=#{problemAnswer},
+		 problem_solution=#{problemSolution},
+		  picture=#{picture},
+		   repot='0',
+		 repotcomment='' 
+	where problem_code=#{problemCode}
+	</update>
+	
+	
+	
+
+<!-- 	문제코드로 문제코드찾기(지문에 달려있는) -->
+	<select id="prCSearchprC" resultType="int">
+	 select problem_code from prob_content
+   where problem_printcode=(select problem_printcode from prob_content where problem_code=#{prC})
+	</select>
+	
+	
+<!-- 	문제코드로 지문 코드 찾기 -->
+	<select id="prCSearchPrintCode" resultType="int">
+	select problem_printcode from prob_content
+    	where problem_code=#{prC}
+	</select>
+
+<!-- 지문 문제 수정 객관식 -->
+<update id="modyfyjProblemG">
+		update problem set
+		 problem_content=#{problemContent1g},
+		 problem_answer=#{problemAnswer1g},
+		 problem_solution=#{problemSolution1g},
+		 none=#{none1g},
+		 ntwo=#{ntwo1g},
+		 ntree=#{ntree1g},
+		 nfour=#{nfour1g},
+		 nfive=#{nfive1g} 
+	where problem_code=#{problemCode}
+	</update>
+
+<!-- 지문 문제 수정 객관식 사닞있는버전 -->
+<update id="modyfyjpProblemG">
+		update problem set
+		 problem_content=#{problemContent1g},
+		 problem_answer=#{problemAnswer1g},
+		 problem_solution=#{problemSolution1g},
+		 none=#{none1g},
+		 ntwo=#{ntwo1g},
+		 ntree=#{ntree1g},
+		 nfour=#{nfour1g},
+		 nfive=#{nfive1g},
+		 picture=#{picture1} 
+	where problem_code=#{problemCode}
+	</update>
+
+<!-- 지문 문제 수정 주관식 -->
+<update id="modyfyjProblemJ">
+		update problem set
+		 problem_content=#{problemContent1j},
+		 problem_answer=#{problemAnswer1j},
+		 problem_solution=#{problemSolution1j},
+		 
+	where problem_code=#{problemCode}
+	</update>
+
+<!-- 지문 문제 수정 주관식(사진있음 )-->
+<update id="modyfyjpProblemJ">
+		update problem set
+		 problem_content=#{problemContent1j},
+		 problem_answer=#{problemAnswer1j},
+		 problem_solution=#{problemSolution1j},
+		 picture=#{picture1} 
+	where problem_code=#{problemCode}
+	</update>
+
+
+<update id="problemPrintUpdate">
+	update prob_content
+	   set problem_print=#{jimoon}
+	   where problem_code=#{prC}
+	   and problem_printcode=#{jiC}
+
+</update>
+
+<select id="endDanSearch" resultType="classprog">
+select 
+a.SUBJECT_PROCCESS,
+a.SUBJECT_SEQ,
+a.SUBDETAIL_CODE,
+a.SUBUNIT_NAME
+from class_prog a,subdetail b 
+where a.SUBDETAIL_CODE=b.SUBDETAIL_CODE
+  and b.subdetail_code=#{detailCode}
+  and a.subject_seq>=#{startDan}  
+ order by  subject_seq asc
+
+</select>
+
+<select id="jimoonSearch" resultType="string">
+select distinct a.problem_printcode
+  from prob_content a,problem b,class_prog c
+  where a.problem_code=b.problem_code
+    and b.subject_proccess=c.subject_proccess
+    and c.subdetail_code='1'
+    <!--    #{detailCode} -->
+    and c.subject_seq  between '1'and'2'
+    <!--     #{starDan}and#{endDan} -->
+</select>
+
+
+<select id="getjimoonProblem" resultType="problem">
+select a.* from problem a,prob_content b
+where a.problem_code=b.problem_code
+  and b.problem_printcode=#{problemPrintCode}
+
+</select>
+
+
+
+<select id="getProcess" resultType="map">
+		select class_code,class_name,subdetail_code from class
+		where id=#{id}
+<!-- 		and sysdate>end_date -->
+	</select>
+
+<select id="getProblemList" resultType="problem">
+		select distinct b.*,a.problem_print
+  from prob_content a,problem b,class_prog c
+  where a.problem_code(+)=b.problem_code
+    and b.subject_proccess=c.subject_proccess
+   and c.subdetail_code='1'
+<!--    #{detailCode} -->
+    and c.subject_seq  between '1'and'2'
+<!--     #{starDan}and#{endDan} -->
+    and a.problem_printcode is null
+
+	</select>
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	<select id="problemJXsdedListCount" resultType="int">
+		select
+		count(*)
+		from (	      
+        
+  		select distinct b.*
+  from prob_content a,problem b,class_prog c
+  where a.problem_code(+)=b.problem_code
+    and b.subject_proccess=c.subject_proccess
+   and c.subdetail_code='1'
+<!--    #{detailCode}  -->
+    and c.subject_seq  between '1'and'2'
+<!--      #{starDan}and#{endDan}  -->
+    and a.problem_printcode is null ) 
+
+	</select>
+	
+	
+	<select id="problemJXsdedList" resultType="problem">
+	
+		select distinct *
+		from(
+		select rownum as
+		rnum,SearchResult.*
+		from (
+	      
+     		select distinct b.*,c.subunit_name
+  from prob_content a,problem b,class_prog c
+  where a.problem_code(+)=b.problem_code
+    and b.subject_proccess=c.subject_proccess
+   and c.subdetail_code='1'
+<!--    #{detailCode}  -->
+    and c.subject_seq  between '1'and'2'
+<!--      #{starDan}and#{endDan}  -->
+    and a.problem_printcode is null
+         order by b.problem_code desc
+		
+
+		) SearchResult
+		    <![CDATA[
+ 		    where rownum <= #{endRow} 
+		    ]]> 
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]> 
+		 order by problem_code desc
+	
+	
+	</select>
+	
+	
+	<select id="problemJsdedList" resultType="problem">
+	
+		select distinct *
+		from(
+		select rownum as
+		rnum,SearchResult.*
+		from (
+	      
+     		select distinct b.*,c.subunit_name
+  from prob_content a,problem b,class_prog c
+  where a.problem_code(+)=b.problem_code
+    and b.subject_proccess=c.subject_proccess
+   and c.subdetail_code='1'
+<!--    #{detailCode}  -->
+    and c.subject_seq  between '1'and'2'
+<!--      #{starDan}and#{endDan}  -->
+    and a.problem_printcode is  not null
+        order by b.problem_code asc
+		
+
+		) SearchResult
+		    <![CDATA[
+ 		    where rownum <= #{endRow} 
+		    ]]> 
+		)
+		 <![CDATA[
+		where rnum > #{startRow}		
+		 ]]> 
+		 order by problem_code  asc
+	</select>
+
+
+
+
+<select id="problemJsdedListCount" resultType="int">
+		select
+		count(*)
+		from (	      
+        
+  		select distinct b.*
+  from prob_content a,problem b,class_prog c
+  where a.problem_code(+)=b.problem_code
+    and b.subject_proccess=c.subject_proccess
+   and c.subdetail_code='1'
+<!--    #{detailCode}  -->
+    and c.subject_seq  between '1'and'2'
+<!--      #{starDan}and#{endDan}  -->
+    and a.problem_printcode is not null ) 
+
+	</select>
+
+
+
+
+
+<select id="examCodeSequenceGet" resultType="int">
+
+
+select
+		exam_seq.nextval as exam_code from dual
+
+</select>	
+
+
+<insert id="examInsert">
+INSERT INTO exam (
+    exam_code
+   ,start_date
+   ,end_date
+   ,exam_name
+   ,class_code
+) VALUES (
+  #{examCode},
+  #{examStart},
+  #{examEnd},
+  #{examName},
+  #{classCode}
+)
+
+</insert>
+
+<insert id="colExamInsert">
+INSERT INTO col_exam (
+    exam_code
+   ,problem_code
+   ,pronum
+) VALUES (
+  #{examCode},
+  #{problemCode},
+  #{pronum}
+)
+
+</insert>
+
+<!-- 시험신고하기 -->
+<update id="repotProblem">
+  update problem  set repot=#{id},
+                     repotcomment=#{comment}
+  where problem_code=#{prC}
+</update>
+
+
+<!-- 최근시험가지고오기 -->
+<select id="recentlyExam" resultType="exam">
+   select START_DATE,exam_name,exam_code,class_name,class_rank
+     from
+                 ( select a.START_DATE,a.exam_name,a.exam_code,b.class_name,b.class_rank from exam a,class b
+ where a.class_code=b.class_code 
+    and exam_code in (select exam_code from col_exam
+    where problem_code=#{prC})
+      order by a.start_date desc)
+      <![CDATA[
+      where rownum<=3 
+          ]]>   
+</select>
+<select id="AllExam" resultType="exam">
+  
+  select a.START_DATE,a.exam_name,a.exam_code,b.class_name,b.class_rank from exam a,class b
+ where a.class_code=b.class_code 
+    and exam_code in (select exam_code from col_exam
+    where problem_code=#{problemCode})
+
+</select>
+
+<!-- 등급별 시험가져오기 -->
+<select id="rankExam" resultType="exam">
+   select START_DATE,exam_name,exam_code,class_name,class_rank
+     from
+                 ( select a.START_DATE,a.exam_name,a.exam_code,b.class_name,b.class_rank from exam a,class b
+ where a.class_code=b.class_code 
+    and exam_code in (select exam_code from col_exam
+    where problem_code=#{prC})
+      order by a.start_date desc)
+         where class_rank=#{rankk}
+</select>
+
+
+
+
+<!-- 시험응시자수 -->
+<select id="examTotalCount" resultType="int">
+    select  count(id) 
+   from class
+   where class_code=(select class_code from exam where exam_code=#{examCode})
+        
+</select>
+
+
+<!-- 시험틀린수 -->
+<select id="wrongTotalCount" resultType="int">
+   select count(distinct id)
+   from wrong where exam_code=#{examCode}
+   and problem_code=#{problemCode}
+</select>
+
+<update id="repotProblemCanCel">
+  update problem set repot='0',
+                     repotcomment=''
+        where problem_code=#{prC}
+</update>
+
+
+
+
+
+
+<select id="repotproblemlist" resultType='problem'>
+    select distinct  
+          a.problem_code
+   ,a.sano
+   ,a.problem_content
+   ,a.lproblem
+   ,a.problem_answer
+   ,a.problem_solution
+   ,a.grade
+   ,a.subject_proccess
+   ,a.school_code
+   ,a.picture
+   ,a.none
+   ,a.ntwo
+   ,a.ntree
+   ,a.nfour
+   ,a.nfive
+   ,a.plevel
+   ,a.maker
+   ,a.repot
+   ,a.repotcomment
+   ,b.subunit_name
+   ,c.saname
+    ,d.subdetail_name
+         from problem a,class_prog b,subarea c,subdetail d     
+         where a.subject_proccess=b.subject_proccess
+         and	   a.sano=c.sano
+          and    d.subdetail_code=b.subdetail_code
+         and a.maker=#{id}
+        and a.repot!='0' 
+        and a.repot is not null
+        
+</select>
+
+
+<select id="printCodeSearchProblem" resultType='problem'>
+select a.*,b.problem_print from problem a,prob_content b
+  where a.problem_code=b.problem_code
+  and b.problem_printcode=#{pc}
+
+
+</select>
+
+<select id="jcheck" resultType="int">
+ select count(*) from prob_content where problem_code=#{prC}
+</select>
+
+
+
+
+<!-- 강의코드로 시험 기본정보들 가져오기 -->
+<select id="getExamClassCode" resultType="exam">
+ select  d.subdetail_name, c.exam_name,c.exam_code
+
+
+        from
+   (select a.*,b.class_name,b.subdetail_code as subdt from exam a, class b
+   where a.class_code=b.class_code 
+   and a.class_code=#{classCode}) c,subdetail d
+   where c.subdt=d.subdetail_code
+
+
+</select>
+
+<!-- 시험코드로 시작 단원 가져오기 -->
+
+<select id="getExamStartDAN" resultType="string">
+ 	select distinct *
+		from(
+		select rownum as
+		rnum,SearchResult.*
+		from (
+   select b.subject_seq as firstdanwon
+      from (select problem_code from col_exam where exam_code=#{examCode}) a,class_prog b
+     order by b.subject_seq asc
+   	) SearchResult
+   	 <![CDATA[
+      where rownum <= 1
+        ]]>   
+      	)
+      	<![CDATA[
+        	where rnum > 0	
+       ]]>   
+</select>
+
+
+
+
+
+
+
+<!-- 마지막단원가져오기 -->
+
+<select id="getExamEndDAN" resultType="string">
+ 	select distinct *
+		from(
+		select rownum as
+		rnum,SearchResult.*
+		from (
+   select b.subject_seq as firstdanwon
+      from (select problem_code from col_exam where exam_code=#{examCode}) a,class_prog b
+     order by b.subject_seq desc
+   	) SearchResult
+   	 <![CDATA[
+       where rownum <= 1 
+         ]]>    
+      	)
+      	<![CDATA[
+         	where rnum > 0	
+        ]]>    
+</select>
+
+<!-- 시험코드로 학생 인원수 조회하여 가지고오기 -->
+<select id="getAcScoreSc" resultType="int">
+  select count(distinct id) from academy_score
+        where exam_code=#{examCode}
+</select>
+
+<!-- 시험코드를 이용한 학생의 모든 점수의 합 가져오기 -->
+<select id="getAcTotalSc" resultType="int">
+select sum(academy_score) from academy_score
+              where exam_code=#{examCode}
+
+</select>
+
+<!-- 시험지 코드로 문제 가지고오기 -->
+<select id="getExamProblem" resultType="problem">
+      	     select distinct  
+          a.problem_code
+   ,a.sano
+   ,a.problem_content
+   ,a.lproblem
+   ,a.problem_answer
+   ,a.problem_solution
+   ,a.grade
+   ,a.subject_proccess
+   ,a.school_code
+   ,a.picture
+   ,a.none
+   ,a.ntwo
+   ,a.ntree
+   ,a.nfour
+   ,a.nfive
+   ,a.plevel
+   ,a.maker
+   ,a.repot
+   ,a.repotcomment
+   ,b.subunit_name
+   ,c.saname
+    ,d.subdetail_name
+     ,e.problem_print
+     ,e.problem_printcode
+     ,f.pronum as examNo
+         from problem a,class_prog b,subarea c,subdetail d,prob_content e,col_exam f       
+         where a.subject_proccess=b.subject_proccess
+         and	   a.sano=c.sano
+          and    d.subdetail_code=b.subdetail_code
+          and  a.problem_code=f.problem_code
+           and e.problem_code(+)=a.problem_code
+          and f.exam_code=#{examCode}
+          order by f.pronum asc
+
+</select>
+
+<select id="getExamCodeWrong" resultType="wrong">
+ SELECT
+    a.wno
+   ,a.id
+   ,a.content
+   ,a.updatedate
+   ,a.exam_code
+   ,a.problem_code
+   ,a.wrong
+   ,a.question
+   ,a.answer
+   ,b.name 
+FROM
+    wrong a,member b
+   where a.id=b.id 
+   and exam_code=#{examCode}
+
+</select>
+
+
+
+
+
+
+
+
+
+<select id="danwonSearch2" resultType="classprog">
+ select subunit_name,subject_proccess from class_prog where subunit_name=#{name}
+
+
+</select>
+
+<select id="getListClass" resultType="class">
+select *from class
+ where id=#{id}
+</select>
+
+<select id="wrongGet" resultType="wrong">
+select *from wrong where wno=#{examCode}
+
+</select>
+
+<update id="inserWrongAnswer">
+ update wrong set answer=#{answer}
+      where wno=#{wno}
+</update>
+
+
+
+<select id="examListGet" resultType="academyScore">
+select b.academy_score,b.id,b.regdate,b.achievement,a.exam_name,b.exam_code
+ from exam a,academy_score b,class c
+   where a.exam_code=b.exam_code
+    and c.class_code=a.class_code
+    and b.id=#{id}
+    and c.class_code=#{classCode}
+
+</select>
+
+
+<select id="getclassClist" resultType="class">
+select * from class
+ where id=#{id}
+
+</select>
+
+<select id="getTSSubarea" resultType="int">
+select count(distinct d.problem_code) from exam a,problem b,subarea c,col_exam d where
+d.problem_code=b.problem_code 
+and b.sano=c.sano 
+and a.exam_code=d.exam_code
+and c.saname=#{subareaName}
+and a.exam_code=#{examCode}
+</select>
+
+
+<select id="getSSubarea" resultType="int">
+select count(distinct a.problem_code) from wrong a,col_exam b,problem c,subarea d
+where a.exam_code=b.exam_code
+ and  c.problem_code=a.problem_code
+ and d.sano=c.sano
+ and d.saname=#{subareaName}
+and a.exam_code=#{examCode}
+and a.id=#{id}
+
+</select>
+
+
+
+
+<select id="searchSanoCode" resultType="int">
+select sano subarea
+from subarea
+ where saname=#{saname}
+ and subdetail_code=#{subdetailCode}
+
+</select>
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Attendance-Mapper">
+	<sql id="monthCnt">
+		<if test="month == 1">
+		<![CDATA[
+			and rownum <=30
+		]]>
+		</if>
+		<if test="month == 3">
+		<![CDATA[
+			and rownum <= 30 * 3
+		]]>
+		</if>
+	</sql>
+	<select id="selectAttendById" resultType="attend" parameterType="attend">
+		select
+		    attendance_code
+		   ,in_time
+		   ,out_time
+		   ,id
+		   ,attendance_status
+		   ,reason
+		   ,regDate
+		from
+		    attendance
+		where id=#{id}
+		and TO_CHAR(regDate, 'yyyy-mm-dd') = TO_CHAR(#{regDate}, 'yyyy-mm-dd')
+	</select>
+
+	<select id="selectAttNextSeq" resultType="int">
+		select att_seq.nextval from dual
+	</select>
+
+	<update id="insertNewAttend" parameterType="attend">
+		insert into attendance (
+		    attendance_code
+		   ,in_time
+		   ,out_time
+		   ,id
+		   ,attendance_status
+		   ,reason
+		   ,regDate
+		) values (
+		    #{attendanceCode}
+		   ,sysdate
+		   ,null
+		   ,#{id}
+		   ,#{attendanceStatus}
+		   ,null
+		   ,sysdate
+		)
+	</update>
+
+	<update id="updateOutTimeIsNow">
+		update attendance
+		    set
+		        out_time = sysdate
+		where
+		    attendance_code = #{attendanceCode}
+	</update>
+
+	<select id="selectEndTime" parameterType="str" resultType="str">
+		select
+		   max(end_time)
+		from
+		    time_detail
+		where class_code in (select
+		                            class_code
+		                        from
+		                            class
+		                        where class_code in (select
+		                            class_code
+		                        from
+		                            class_ing
+		                        where id=#{id}))
+		    and classday = to_char(sysdate, 'd')-1
+
+	</select>
+	<select id="selectEndTimeForTeacher" parameterType="str" resultType="str">
+		select
+		   max(end_time)
+		from
+		    time_detail
+		where class_code in (select
+		                            class_code
+		                        from
+		                            class
+		                        where id=#{id})
+		    and classday = to_char(sysdate, 'd')-1
+
+	</select>
+	
+
+	<select id="selectStartTime" parameterType="str" resultType="str">
+		select
+		   min(start_time)
+		from
+		    time_detail
+		where class_code in (select
+		                            class_code
+		                        from
+		                            class
+		                        where class_code in (select
+		                            class_code
+		                        from
+		                            class_ing
+		                        where id=#{id}))
+		    and classday = to_char(sysdate, 'd')-1
+
+	</select>
+	<select id="selectStartTimeForTeacher" resultType="str">
+		select
+		   min(start_time)
+		from
+		    time_detail
+		where class_code in (select
+		                            class_code
+		                        from
+		                            class
+		                        where id=#{id})
+		    and classday = to_char(sysdate, 'd')-1
+	</select>
+	
+
+	<update id="updateStatus" parameterType="attend">
+		update attendance
+		    set
+		        attendance_status = #{attendanceStatus}
+		where
+		    attendance_code = #{attendanceCode}
+	</update>
+
+	<update id="updateInTime" parameterType="attend">
+		update attendance
+		    set
+		        in_time = #{inTime}
+		where
+		    attendance_code = #{attendanceCode}
+	</update>
+
+	<update id="insertEmptyAttend" parameterType="attend">
+	insert into attendance (
+	    attendance_code
+	   ,id
+	   ,regDate
+	) values (
+	    #{attendanceCode}
+	   ,#{id}
+	   ,#{redDate}
+
+	)
+	</update>
+
+	<select id="selectAllAttendById" resultType="attend">
+		select
+		    attendance_code
+		   ,in_time
+		   ,out_time
+		   ,id
+		   ,attendance_status
+		   ,reason
+		   ,regDate
+		from
+		    attendance
+		where id = #{id}
+		<include refid="monthCnt" />
+		order by regDate desc
+	</select>
+
+	<select id="selectAllAttendByIdCount" resultType="int">
+		select
+		    count(*)
+		from
+		    attendance
+		where id = #{id}
+		<include refid="monthCnt" />
+	</select>
+
+</mapper>

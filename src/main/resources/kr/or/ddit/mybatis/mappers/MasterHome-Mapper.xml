@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="MasterHome-Mapper">
+ 
+ 	<select id="selectTeacherAttendList" resultType="teachermas">
+		select
+			a.id
+			,a.name
+			,a.phone
+			,b.regdate
+			,b.in_time
+			,b.out_time
+			,b.attendance_status
+		from
+			member a,
+			attendance b
+			where a.authority='ROLE_TEACHER'
+			and b.id=a.id
+			and	to_char(b.regDate, 'yyyy-mm-dd') = to_char(to_date(sysdate),
+			'yyyy-mm-dd')
+		order by b.in_time desc
+ 	</select>
+ 
+ 	<select id="selectCounseltList" resultType="pacounselt">
+		select
+		*
+		from pacounselt
+		where pc_code is not null
+		  and status='0'
+		order by meetdate desc
+ 	</select>
+ 	
+ 	
+ 	<select id="selectMemberCnt" resultType="memberCountVO">
+		select
+		    rownum 
+		   ,cntno
+		   ,regdate
+		   ,memcnt
+		from
+		    membercnt
+		<![CDATA[
+		where rownum <= 12
+		]]>
+		order by regdate
+ 	</select>
+ 	
+ 	<select id="selectSubdetail" resultType="subject">
+	 	select subdetail_code, subdetail_name
+	 	 from subdetail
+ 	</select>
+ 	
+	 <select id="selectSubDetailClassingCount" resultType="subdetailClassingVO">
+		select count(*) as cnt, c.subdetail_name
+		from class a, class_ing b, subdetail c
+		where a.class_code = b.class_code
+		and c.subdetail_code = a.subdetail_code
+		and a.subdetail_code=#{subdetailCode}
+		group by c.subdetail_name
+ 	</select>
+ 	
+ 	<select id="selectSchoolList" resultType="school">
+ 		select school_name, school_code from school_detail
+ 	</select>
+ 	
+ 	<select id="selectSchoolCountBySchoolCodeFromMember" resultType="school">
+		select count(*) as cnt, b.school_name ,b.school_code
+        from member a, school_detail b
+        where a.school_code = b.school_code
+          and b.school_code=#{schoolCode}
+          and AUTHORITY='ROLE_STUDENT'
+        group by b.school_name, b.school_code
+ 	</select>
+ 	
+ </mapper>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

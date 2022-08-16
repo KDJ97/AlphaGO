@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- summernote Image Path -->
+	<bean id="imgPath" class="java.lang.String">
+		<constructor-arg value="${summernote.img}" />
+	</bean>
+
+	<!-- member.picture -->
+	<bean id="picturePath" class="java.lang.String">
+		<constructor-arg value="${member.picture.upload}" />
+	</bean>
+
+	<!-- file upload -->
+	<bean id="fileUploadPath" class="java.lang.String">
+		<constructor-arg value="${pds.upload}"/>
+	</bean>
+
+	<!-- login user log path -->
+	<bean id="loginUserLogSavePath" class="java.lang.String">
+		<constructor-arg value="${login.user.log}"/>
+	</bean>
+
+	<bean id = "errorLogPath" class="java.lang.String">
+		<constructor-arg value="${error.log}"/>
+	</bean>
+
+	<bean id="qrPath" class="java.lang.String">
+		<constructor-arg value="${qr.upload}"/>
+	</bean>
+
+
+	<!-- 팝업 파일 업로드 경로 -->
+	<bean id="popupUploadPath" class="java.lang.String">
+		<constructor-arg value="${popup.upload}"/>
+	</bean>
+
+	<bean id="classroomUploadPath" class="java.lang.String">
+		<constructor-arg value="${classroom.upload}"/>
+	</bean>
+
+	<bean id="applyUploadPath"  class="java.lang.String">
+		 <constructor-arg value="${apply.upload}"/>
+	</bean>
+
+	<bean id="resumeUploadPath"  class="java.lang.String">
+		 <constructor-arg value="${resume.upload}"/>
+	</bean>
+
+	<!-- Repository -->
+	<bean id="memberDAO" class="kr.or.ddit.dao.MemberDAOImpl"
+		  p:session-ref="sqlSession"
+	/>
+	<bean id="lboardDAO" class="kr.or.ddit.dao.LboardDAOImpl"
+		  p:session-ref="sqlSession"
+	/>
+	<bean id="noticeDAO" class="kr.or.ddit.dao.NoticeDAOImpl"
+	      p:session-ref="sqlSession"
+	/>
+	<bean id="suggestDAO" class="kr.or.ddit.dao.SuggestDAOImpl"
+	      p:session-ref="sqlSession"
+	/>
+	<bean id="suggestAnswerDAO" class="kr.or.ddit.dao.SuggestAnswerDAOImpl"
+	 	  p:session-ref="sqlSession"
+	/>
+	<bean id="dmDAO" class="kr.or.ddit.dao.DmDAOImpl"
+	      p:session-ref="sqlSession"
+	/>
+	<bean id="calendarDAO" class="kr.or.ddit.dao.CalendarDAOImpl"
+	      p:session-ref="sqlSession"
+	/>
+	<bean id="pdsDAO" class="kr.or.ddit.dao.PdsDAOImpl"
+		  p:session-ref="sqlSession"
+	/>
+	<bean id="menuDAO" class="kr.or.ddit.dao.MenuDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="classroomDAO" class="kr.or.ddit.dao.ClassroomDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="useFixtureDAO" class="kr.or.ddit.dao.UseFixtureDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="assignDAO" class="kr.or.ddit.dao.AssignDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="studentDAO" class="kr.or.ddit.dao.StudentDAOImpl"
+	    p:session-ref="sqlSession"
+	/>
+	<bean id="attachDAO" class="kr.or.ddit.dao.AttachDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="favoritesDAO" class="kr.or.ddit.dao.FavoritesDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="teacherDAO" class="kr.or.ddit.dao.TeacherDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="teacherMasDAO" class="kr.or.ddit.dao.TeacherMasDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="applyDAO" class="kr.or.ddit.dao.ApplyDAOImpl"
+    p:session-ref="sqlSession"
+    />
+    <bean id="classDAO" class="kr.or.ddit.dao.ClassDAOImpl"
+    p:session-ref="sqlSession"
+    />
+
+    <bean id="pacounseltDAO"  class="kr.or.ddit.dao.PacounseltDAOImpl"
+    p:session-ref="sqlSession"
+    />
+    <bean id="tclassDAO" class="kr.or.ddit.dao.TclassDAOImpl"
+    p:session-ref="sqlSession"
+    />
+
+    <bean id="schoolDAO" class="kr.or.ddit.dao.SchoolDAOImpl"
+    p:session-ref="sqlSession"
+    />
+    <bean id="examDAO" class="kr.or.ddit.dao.ExamDAOImpl"
+    p:session-ref="sqlSession"
+    />
+
+    <bean id="studyPlanDAO" class="kr.or.ddit.dao.StudyPlanDAOImpl"
+      p:session-ref="sqlSession"
+    />
+
+    <bean id="popupDAO" class="kr.or.ddit.dao.PopupDAOImpl"
+      p:session-ref="sqlSession"
+    />
+
+    <bean id="attendDAO" class="kr.or.ddit.dao.AttendanceDAOImpl"
+    	p:session-ref="sqlSession"
+    />
+
+    <bean id="universityDAO" class="kr.or.ddit.dao.UniversityDAOImpl"
+    	p:session-ref="sqlSession"
+    />
+	<bean id="TMyPageDAO" class="kr.or.ddit.dao.TMyPageDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+
+	<bean id="scoreDAO" class="kr.or.ddit.dao.ScoreDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="wrongDAO" class="kr.or.ddit.dao.WrongDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="mhomeDAO" class="kr.or.ddit.dao.MHomeDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+
+	<bean id="resumeDAO"  class="kr.or.ddit.dao.ResumeDAOImpl"
+	    p:session-ref="sqlSession"
+	/>
+
+	<bean id="MStudyPlanDAO"  class="kr.or.ddit.dao.MStudyPlanDAOImpl"
+	    p:session-ref="sqlSession"
+	/>
+
+	<bean id="reviewDAO"  class="kr.or.ddit.dao.ReviewDAOImpl"
+	    p:session-ref="sqlSession"
+	/>
+
+	<bean id="counseltDAO"  class="kr.or.ddit.dao.CounseltDAOImpl"
+	    p:session-ref="sqlSession"
+	/>
+	
+	<bean id="tecounseltDAO"  class="kr.or.ddit.dao.TecounseltDAOImpl"
+	   p:session-ref="sqlSession"
+	/>
+
+<!-- 	<bean id="loginUserLogDAO" -->
+<!-- 		  class="kr.or.ddit.dao.LoginUserLogDAOImpl" -->
+<!-- 		  p:session-ref="sqlSession" -->
+<!-- 	/> -->
+
+
+	<!-- Service -->
+	<bean id="menuService" class="kr.or.ddit.service.MenuServiceImpl"
+		p:menuDAO-ref="menuDAO"
+	/>
+
+	<bean id="memberService" class="kr.or.ddit.service.MemberServiceImpl"
+		p:memberDAO-ref="memberDAO"
+		p:universityDAO-ref="universityDAO"
+	/>
+	<bean id="noticeService" class="kr.or.ddit.service.NoticeServiceImpl"
+		p:noticeDAO-ref="noticeDAO"
+		p:attachDAO-ref="attachDAO"
+		p:LBoardDAO-ref="lboardDAO"
+	/>
+	<bean id="suggestService" class="kr.or.ddit.service.SuggestServiceImpl"
+		p:suggestDAO-ref="suggestDAO"
+		p:lboardDAO-ref="lboardDAO"
+		p:suggestAnswerDAO-ref="suggestAnswerDAO"
+	/>
+	<bean id="suggestAnswerService" class="kr.or.ddit.service.SuggestAnswerServiceImpl"
+		  p:suggestAnswerDAO-ref="suggestAnswerDAO"
+		  p:memberDAO-ref="memberDAO"
+	/>
+	<bean id="dmService" class="kr.or.ddit.service.DmServiceImpl"
+		p:dmDAO-ref="dmDAO"
+	/>
+	<bean id="calendarService" class="kr.or.ddit.service.CalendarServiceImpl"
+		p:calenderDAO-ref="calendarDAO"
+	/>
+	<bean id="classroomService" class="kr.or.ddit.service.ClassroomServiceImpl"
+		p:classroomDAO-ref="classroomDAO"
+		p:useFixtureDAO-ref="useFixtureDAO"
+		p:classDAO-ref="classDAO"
+	/>
+	<bean id="assignService" class="kr.or.ddit.service.AssignServiceImpl"
+		p:assignDAO-ref="assignDAO"
+	/>
+
+	<bean id="studentService"  class="kr.or.ddit.service.StudentServiceImpl"
+	   p:studentDAO-ref="studentDAO"
+	   />
+
+	   <bean id="pdsService" class="kr.or.ddit.service.PdsServiceImpl"
+		p:pdsDAO-ref="pdsDAO"
+		p:lBoardDAO-ref="lboardDAO"
+		p:attachDAO-ref="attachDAO"
+	/>
+	<bean id="favoritesService" class="kr.or.ddit.service.FavoritesServiceImpl"
+		p:favoritesDAO-ref="favoritesDAO"
+	/>
+
+
+	  <bean id="teacherMasService" class="kr.or.ddit.service.TeacherMasServiceImpl"
+	    p:teachermasDAO-ref="teacherMasDAO"
+	   />
+	   <bean id="teacherService" class="kr.or.ddit.service.TeacherServiceImpl"
+		p:teacherDAO-ref="teacherDAO"
+	   />
+
+	<bean id="applyService" class="kr.or.ddit.service.ApplyServiceImpl"
+	  p:applyDAO-ref="applyDAO"
+	  />
+
+	  <bean id="classService" class="kr.or.ddit.service.ClassServiceImpl"
+	  p:classDAO-ref="classDAO"
+	  p:classroomDAO-ref="classroomDAO"
+	  />
+
+     <bean id="pacounseltService" class="kr.or.ddit.service.PacounseltServiceImpl"
+ 	p:counseltDAO-ref="pacounseltDAO"
+ 	/>
+ 	<bean id="tclassService" class="kr.or.ddit.service.TclassServiceImpl"
+ 		p:tclassDAO-ref="tclassDAO"
+ 	/>
+
+ 	<bean id="examService" class="kr.or.ddit.service.ExamServiceImpl"
+ 		p:examDAO-ref="examDAO"
+ 	/>
+
+ 	<bean id="schoolService" class="kr.or.ddit.service.SchoolServiceImpl"
+	p:schoolDAO-ref="schoolDAO"
+ 	/>
+
+	<bean id="studyPlanService" class="kr.or.ddit.service.StudyPlanServiceImpl"
+		p:studyPlanDAO-ref="studyPlanDAO"
+	/>
+
+	<bean id="popupService" class="kr.or.ddit.service.PopupServiceImpl"
+		p:popupDAO-ref="popupDAO"
+	/>
+
+	<bean id="attendanceService" class="kr.or.ddit.service.AttendanceServiceImpl"
+		p:attendanceDAO-ref="attendDAO"
+	/>
+
+	<bean id="universityService" class="kr.or.ddit.service.UniversityServiceImpl"
+		p:universityDAO-ref="universityDAO"
+	/>
+	<bean id="TMyPageService" class="kr.or.ddit.service.TMyPageServiceImpl"
+		p:tMyPageDAO-ref="TMyPageDAO"
+	/>
+	<bean id="scoreService" class="kr.or.ddit.service.ScoreServiceImpl"
+		p:scoreDAO-ref="scoreDAO"
+		p:classDAO-ref="classDAO"
+	/>
+	<bean id="WrongService" class="kr.or.ddit.service.WrongServiceImpl"
+		p:wrongDAO-ref="wrongDAO"
+	/>
+	<bean id="MHomeService" class="kr.or.ddit.service.MHomeServiceImpl"
+		p:mhomeDAO-ref="mhomeDAO"
+		p:counseltDAO-ref="pacounseltDAO"
+		p:applyDAO-ref="applyDAO"
+	/>
+
+	<bean id="resumeService"  class="kr.or.ddit.service.ResumeSerivceImpl"
+	   p:resumeDAO-ref="resumeDAO"
+	/>
+
+	<bean id="MStudyPlanService"  class="kr.or.ddit.service.MStudyPlanServiceImpl"
+		p:mStudyPlanDAO-ref="MStudyPlanDAO"
+		p:classDAO-ref="classDAO"
+	/>
+	<bean id="reviewService"  class="kr.or.ddit.service.ReviewServiceImpl"
+		p:reviewDAO-ref="reviewDAO"
+	/>
+
+	<bean id="counseltService"  class="kr.or.ddit.service.CounseltServiceImpl"
+		p:counseltDAO-ref="counseltDAO"
+	/>
+	
+	<bean id="tecounseltService"  class="kr.or.ddit.service.TecounseltServiceImpl"
+	   p:tecounseltDAO-ref="tecounseltDAO"
+	/>
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
+

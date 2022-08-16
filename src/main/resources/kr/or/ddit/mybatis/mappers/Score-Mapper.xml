@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <mapper namespace="Score-Mapper">
+	<select id="selectSchoolScoreListByTestName" resultType="kr.or.ddit.dto.SchoolScoreVO">
+		select
+		    sscode
+		   ,id
+		   ,myscore
+		   ,mygrade
+		   ,standard_score
+		   ,school_year
+		   ,school_term
+		   ,subject_code
+		   ,regdate
+		   ,achievement
+		   ,rank
+		   ,stucnt
+		   ,perfect_score
+		   ,test_name
+		from
+		    school_score
+		where
+		    id=#{id}
+		    and school_year = #{schoolYear}
+		    and test_name = #{testName}
+
+	</select>
+	<update id="deleteScoreData" parameterType="int">
+	   delete from school_score
+		where
+		    sscode = #{sscode}
+	</update>
+	<select id="selectNextSeq" resultType="int">
+		select sscore_seq.nextval
+  			from dual
+	</select>
+	<update id="insertScore" parameterType="kr.or.ddit.dto.SchoolScoreVO">
+		insert into school_score (
+		    sscode
+		   ,id
+		   ,myscore
+		   ,mygrade
+		   ,standard_score
+		   ,school_year
+		   ,school_term
+		   ,subject_code
+		   ,regdate
+		   ,achievement
+		   ,rank
+		   ,stucnt
+		   ,perfect_score
+		   ,test_name
+		) values (
+		    #{sscode}
+		   ,#{id}
+		   ,#{myscore}
+		   ,#{mygrade}
+		   ,#{standardScore}
+		   ,#{schoolYear}
+		   ,#{schoolTerm}
+		   ,#{subjectCode}
+		   ,sysdate
+		   ,#{achievement}
+		   ,#{rank}
+		   ,#{stucnt}
+		   ,#{perfectScore}
+		   ,#{testName}
+		)
+	</update>
+
+	<update id="modifyScore" parameterType="kr.or.ddit.dto.SchoolScoreVO">
+		update school_score
+		    set
+		        id = #{id}
+		       ,myscore = #{myscore}
+		       ,mygrade = #{mygrade}
+		       ,standard_score = #{standardScore}
+		       ,school_year = #{schoolYear}
+		       ,school_term = #{schoolTerm}
+		       ,subject_code = #{subjectCode}
+		       ,achievement = #{achievement}
+		       ,rank = #{rank}
+		       ,stucnt = #{stucnt}
+		       ,perfect_score = #{perfectScore}
+		       ,test_name = #{testName}
+		where
+		    sscode = #{sscode}
+
+	</update>
+
+	<sql id="subject">
+	  <if test="subjectCode != null">
+	  	and subject_code = #{subjectCode}
+	  </if>
+	</sql>
+
+	<select id="selectAllScoreList" resultType="kr.or.ddit.dto.SchoolScoreVO">
+	select
+		    sscode
+		   ,id
+		   ,myscore
+		   ,mygrade
+		   ,standard_score
+		   ,school_year
+		   ,school_term
+		   ,subject_code
+		   ,regdate
+		   ,achievement
+		   ,rank
+		   ,stucnt
+		   ,perfect_score
+		   ,test_name
+		from
+		    school_score
+		where
+		    id=#{id}
+		 <include refid="subject"/>
+		 order by school_year,  substr(test_name, 0, instr(test_name, '학기')) asc, substr(test_name, instr(test_name, '학기')) desc
+	</select>
+
+	<select id="selectAcademyScoreListByClassCode" resultType="academyScore">
+		select
+		     a.ascode
+		       ,a.academy_score
+		       ,a.exam_code
+		       ,a.id
+		       ,a.regdate
+		       ,a.perfect_score
+		       ,a.achievement
+		from
+		    academy_score a, exam b, class c
+		where
+		    a.exam_code = b.exam_code
+		    and b.class_code = c.class_code
+		    and a.id = #{id}
+		    and c.class_code = #{classCode}
+
+	</select>
+
+	<select id="selectExamNameByCode" parameterType="int" resultType="str">
+		select
+		   exam_name
+		from
+		    exam
+		where exam_code = #{code}
+	</select>
+
+	<select id="selectAvgByCode" parameterType="int" resultType="java.lang.Double">
+		select
+		   avg(academy_score)
+		from
+		    academy_score
+		where exam_code = #{code}
+	</select>
+
+	<select id="selectExamScoreBySubjectCode" resultType="map">
+		select
+		    a.exam_code
+		    ,a.exam_name
+		    ,d.academy_score
+		from
+		    exam a, class b, subdetail c, academy_score d
+		where a.class_code = b.class_code
+		    and b.subdetail_code = c.subdetail_code
+		    and a.exam_code = d.exam_code
+		    and c.subject_code = #{subjectCode}
+		    and d.id = #{id}
+		order by d.regdate
+	</select>
+
+	<select id="selectAllExamScoreBySubjectCode" parameterType="int" resultType="map">
+		select
+		    a.exam_code
+		    ,a.exam_name
+		    ,d.academy_score
+		from
+		    exam a, class b, subdetail c, academy_score d
+		where a.class_code = b.class_code
+		    and b.subdetail_code = c.subdetail_code
+		    and a.exam_code = d.exam_code
+		    and c.subject_code = #{subjectCode}
+		order by d.regdate
+	</select>
+
+	<!-- 과목별  학생이 본 시험문제의 과목영역 리스트 -->
+	<select id="selectSubAreaListBySubject" parameterType="int" resultType="kr.or.ddit.dto.SubAreaVO">
+		select distinct
+		    a.saname
+		from
+		    subarea a, subdetail b, subject c
+		where a.subdetail_code = b.subdetail_code
+		   and b.subject_code = c.subject_code
+		   and c.subject_code = #{code}
+	</select>
+
+	<!-- 학생이 본 문제별 과목영역리스트-->
+	<select id="selectSubAreaListBySubjectProblem" parameterType="map" resultType="map">
+		select distinct
+		     f.problem_code
+		    ,a.sano
+		    ,a.saname
+		    ,b.subject_name
+		from subarea a, subject b, subdetail c, academy_score d, col_exam e, problem f
+		where a.subdetail_code = c.subdetail_code
+		  and c.subject_code = b.subject_code
+		  and d.exam_code = e.exam_code
+		  and e.problem_code = f.problem_code
+		  and a.sano = f.sano
+		  and d.id=#{id}
+		  and b.subject_code = #{subjectCode}
+	</select>
+
+	<!-- 학생이 본 틀린 문제별 과목영역리스트-->
+	<select id="selectSubAreaListBySubjectWorngProblem" parameterType="map" resultType="map">
+	select distinct
+	    f.problem_code
+	    ,a.sano
+	    ,a.saname
+	    ,b.subject_name
+	from subarea a, subject b, subdetail c, academy_score d, col_exam e, problem f
+	where a.subdetail_code = c.subdetail_code
+	  and c.subject_code = b.subject_code
+	  and d.exam_code = e.exam_code
+	  and e.problem_code = f.problem_code
+	  and a.sano = f.sano
+	  and d.id=#{id}
+	  and b.subject_code = #{subjectCode}
+	  and f.problem_code in (select
+	                            problem_code
+	                        from wrong
+	                        where id=#{id})
+	</select>
+
+	<select id="selectAcademyScoreListBySubjectCodeAndId" resultType="academyScore">
+		select
+		    a.ascode
+		   ,a.academy_score
+		   ,a.exam_code
+		   ,a.id
+		   ,a.regdate
+		   ,a.perfect_score
+		   ,a.achievement
+		from
+		    academy_score a, exam b, class c, subdetail d
+		where a.exam_code =  b.exam_code
+		  and b.class_code = c.class_code
+		  and c.subdetail_code = d.subdetail_code
+		  and a.id = #{id}
+		  and d.subject_code = ${subjectCode}
+	</select>
+
+	<!-- 상향대학 -->
+	<select id="selectOverUniversity" parameterType="str" resultType="pacounselt">
+		select distinct
+			 a.university_name
+			from university a,
+			school_score b,
+			pacounselt c
+			where b.id=client
+	          and b.id=#{id}
+			and
+			(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)<![CDATA[<0.8]]>
+			   <![CDATA[
+		    and rownum <= 3
+			]]>
+
+	</select>
+	<!-- 적정대학 -->
+	<select id="selectPosibleUniversity" parameterType="str" resultType="pacounselt">
+		select distinct
+			a.university_name
+		from university a,
+			school_score b,
+			pacounselt c
+		where
+			b.id=client
+			 and b.id=#{id}
+			and
+			(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)between
+			0.8 and 1.2
+			and	<![CDATA[ rownum <= 3 ]]>
+
+	</select>
+	<!-- 하향대학 -->
+	<select id="selectLowUniversity" parameterType="str" resultType="pacounselt">
+		select distinct
+		a.university_name
+
+		from university a,
+		school_score b,
+		pacounselt c
+		where
+		b.id=client
+		and b.id=#{id}
+		and
+		(((a.university_kor+a.university_eng+a.university_math+a.university_social+a.university_science)/5)/b.mygrade)>1.2
+	and
+	<![CDATA[
+		    rownum <= 3
+			]]>
+
+	</select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

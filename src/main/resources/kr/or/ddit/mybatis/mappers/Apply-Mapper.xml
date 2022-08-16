@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Apply-Mapper">
+	<sql id="search">
+	<if test="searchType == 'tcw'.toString()">
+			and applyer like '%'||#{keyword}||'%'
+			
+			or applyer_tel like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 't'.toString()">
+			and applyer like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and applyer_tel like '%'||#{keyword}||'%'
+		</if>
+		
+	</sql>
+
+
+	<select id="selectApplyList" resultType="apply">
+		select
+		*
+		from
+		apply
+		order by regdate desc
+	</select>
+	
+	<select id="selectApplyListCount" resultType="int">
+		select 
+		count(*)
+		from
+		apply
+		order by regdate desc	
+	</select>
+
+	<select id="selectSearchApplyList" resultType="apply">
+		select
+		* 
+		from apply
+		 where apply_code is not null 
+		 
+		<include refid="search" />
+		order by regdate desc	
+	</select>
+	
+	<select id="selectSearchApplyListCount" resultType="int">
+		select
+		count(*) 
+		from apply
+		where apply_code is not null 
+	    
+		<include refid="search" />
+	</select>
+	
+	
+
+<!-- 	<select id="selectAttachByApplyCode" resultType="apply"> -->
+<!-- 		select * -->
+<!-- 		from apply -->
+<!-- 		where apply_code=#{applyCode} -->
+<!-- 	</select> -->
+	
+	<update id="insertApply" parameterType="apply">
+	   INSERT INTO apply (
+   			 apply_code
+   			,applyer
+  			 ,applyer_tel
+  			 ,apply_title
+  			 ,apply_content
+ 			 ,apply_uploadpath
+   			,regdate
+    			,apply_filename 
+		) VALUES (
+    		#{applyCode}
+  		 	,#{applyer}
+   			,#{applyerTel}
+   			,#{applyTitle}
+   			,#{applyContent}
+  		 	,#{applyUploadPath} 
+  		 	,sysdate
+   		 	,#{applyFilename} 
+		)
+	</update>
+	
+	<select id="selectApplySequenceNextValue" resultType="int">
+	
+		select apply_seq.nextval from dual
+	
+	</select>
+	
+	<update id="updateFileName" parameterType="str">
+		update
+		apply
+		set apply_filename=#{applyFilename}
+		
+	</update>
+	
+	
+	<select id="selectApplyByApplyCode" resultType="apply">
+		SELECT
+  	  apply_code
+  	 ,applyer
+  	 ,applyer_tel
+  	 ,apply_title
+  	 ,apply_content
+  	 ,apply_uploadpath
+   	,regdate
+  	 ,apply_filename
+	FROM
+  	  apply
+   	 where apply_code=#{applyCode}
+   	 </select>
+	
+	
+</mapper>
+

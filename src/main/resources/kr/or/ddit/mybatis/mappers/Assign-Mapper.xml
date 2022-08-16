@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Assign-Mapper">
+	<select id="selectAssignName" resultType="assignName" parameterType="map">
+		select KK.*, d.status from
+   		(select TO_CHAR(a.start_date, 'yyyy/MM/dd') as start_date, TO_CHAR(a.end_date, 'yyyy/MM/dd') as end_date, a.title, a.assign_code
+		from assign a, class b, class_ing c
+		where b.class_code = c.class_code
+		and a.class_code = b.class_code
+        and c.id = #{id}
+		and b.class_name = #{className}
+		order by end_date) KK, assign_attach d
+   		where KK.assign_code = d.assign_code(+)
+	</select>
+	
+	<select id="getAssign" resultType="assignName" parameterType="String">
+		select * from
+		(select TO_CHAR(a.start_date, 'yyyy/MM/dd') as start_date, TO_CHAR(a.end_date, 'yyyy/MM/dd') as end_date, a.title, a.assign_code, b.class_name
+		from assign a, class b, class_ing c
+		where b.class_code = c.class_code
+		and a.class_code = b.class_code
+		and c.id = #{id}
+		minus
+		select TO_CHAR(a.start_date, 'yyyy/MM/dd') as start_date, TO_CHAR(a.end_date, 'yyyy/MM/dd') as end_date, a.title, a.assign_code, b.class_name
+		from assign a, class b, class_ing c, assign_attach d
+		where b.class_code = c.class_code
+		and a.class_code = b.class_code
+		and a.assign_code = d.assign_code
+		and c.id = #{id})
+		<![CDATA[where TO_CHAR(SYSDATE, 'yyyy/MM/dd') <= end_date]]>
+		order by end_date
+	</select>
+	
+	<select id="selectAssignDetail" resultType="assign" parameterType="int">
+		select
+		*
+		from
+		assign
+		where assign_code=#{assignCode}
+	</select>
+	
+	<select id="selectAttach" resultType="assignAttach" parameterType="map">
+		SELECT
+		*
+		FROM
+		assign_attach
+		where id = #{id}
+		and assign_code = #{assignCode}
+	</select>
+	
+	<update id="insertAttach" parameterType="assignAttach">
+		INSERT INTO assign_attach (assign_code,id,uploadpath,filename,filetype,content,status,regdate)
+		VALUES (
+		#{assignCode}
+		,#{id}
+		,#{uploadpath}
+		,#{filename}
+		,#{filetype}
+		,#{content}
+		,#{status}
+		,sysdate
+		)
+	</update>
+	
+	<update id="updateAttach" parameterType="assignAttach">
+		update assign_attach
+		set
+		content=#{content},uploadpath=#{uploadpath},filename=#{filename},filetype=#{filetype},updatedate=sysdate
+		where assign_code=#{assignCode}
+		and id=#{id}
+	</update>
+	
+	<update id="deleteAttach" parameterType="map">
+		delete
+		from assign_attach
+		where
+		assign_code=#{assignCode}
+		and id=#{id}
+	</update>
+	
+	<select id="selectAssignForTeacher" resultType="assign">
+		select a.assign_code, a.title, a.start_date, a.end_date, b.class_name, a.class_code
+		  from assign a, class b
+		 where b.id=#{id}
+		   and a.class_code=b.class_code
+		 order by a.end_date,b.class_name  
+	</select>
+	
+	<select id="selectStudentAndStatusList" parameterType="map" resultType="assignAttach">
+		select a.name, a.id, c.status, b.end_date, b.title
+	  	  from member a, assign b, assign_attach c
+		 where b.class_code=#{classCode}
+		   and c.assign_code=#{assignCode}
+		   and a.id=c.id
+		   and b.assign_code=c.assign_code
+		 order by c.status  
+	</select>
+	
+	<select id="selectSubmitStudentForHome" resultType="assignAttach">
+		select a.name, b.status, c.title, c.end_date,c.assign_code,a.id
+       from member a , assign_attach b, assign c, class d
+       where d.class_code=c.class_code
+       and c.assign_code=b.assign_code
+       and b.id=a.id
+       and d.id=#{id}
+       <![CDATA[
+       and c.end_date>=sysdate
+       ]]>
+       order by c.end_date
+	</select>
+	<select id="selectStudentAtClassForHome" resultType="assignAttach">
+		select  a.title, a.end_date, d.name, d.id
+        from assign a, class b, class_ing c, member d
+        where a.class_code=b.class_code
+        and b.class_code=c.class_code
+        and c.id=d.id
+        and b.id = #{id}
+        <![CDATA[
+        and a.end_date>=sysdate
+        ]]>
+        order by a.end_date,a.title
+	</select>
+	
+	
+	
+	<select id="selectRegisteredStudentAtClass" resultType="member">
+		select distinct a.name, a.id
+		from member a, class_ing b, assign c
+		where b.class_code=#{classCode}
+		and a.id=b.id
+		and b.class_code=c.class_code
+	</select>
+
+	<select id="selectAssignAttachList" resultType="assignAttach">
+		select a.assign_code, a.id, a.status
+		from assign_attach a
+		where assign_code=#{assignCode}
+	</select>
+
+	<select id="selectClassListNotFinished" resultType="class">
+		select class_code, class_name 
+	 	  from class
+		 where id=#{id}
+		 and cpcheck='3'
+  <![CDATA[and end_date >= sysdate]]>
+	</select>
+
+	<select id="selectAssignSeqNextValue" resultType="int">
+		select assign_seq.nextval from dual
+	</select>
+	
+	<update id="insertAssign" parameterType="assign">
+		insert into assign 
+		(assign_code, class_code, start_date, end_date, regdate, title, content, uploadpath, filename, filetype)
+		values
+		(#{assignCode},#{classCode},TO_DATE(#{startDate}, 'YYYY-MM-DD HH24:MI'),TO_DATE(#{endDate}, 'YYYY-MM-DD HH24:MI'),sysdate,#{title},#{content},#{uploadpath},#{filename},#{filetype})		
+	</update>
+	
+	<update id="deleteFile" >
+		update assign	
+		   set uploadpath=null, filename=null, filetype=null
+		 where assign_code=#{assignCode}  
+	</update>
+	<update id="deleteAssign">
+		delete from assign
+		where assign_code=#{assignCode}
+	</update>
+
+	<update id="updateAssign" parameterType="assign">
+		update assign
+		set
+			title=#{title},end_date=TO_DATE(#{endDate},'YYYY-MM-DD HH24:MI'),content=#{content},updatedate=sysdate,
+			uploadpath=#{uploadpath},filename=#{filename},filetype=#{filetype}
+		where assign_code=#{assignCode}
+	</update>
+	
+	<select id="selectTotalCountStudent" resultType="int">
+		select count(*) from class_ing
+		 where class_code=#{classCode}
+	</select>
+	
+	<select id="selectSubmitStudentCount" resultType="int">
+		select count(*) from assign_attach
+		 where assign_code=#{assignCode}
+	</select>
+	
+	<update id="checkHomework" parameterType="map">
+	 	update assign_attach 
+	 	   set confirm=#{confirm}
+	 	 where assign_code=#{assignCode} 
+	 	   and id=#{id}
+	</update>
+	
+	
+	
+</mapper>
